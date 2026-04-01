@@ -32,7 +32,11 @@ export function DocumentViewer({
   const [regenerating, setRegenerating] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  const sections = Object.keys(content);
+  const sections = Object.keys(content).sort((a, b) => {
+    const numA = parseInt(sectionLabels[a]?.match(/^(\d+)/)?.[1] || "99");
+    const numB = parseInt(sectionLabels[b]?.match(/^(\d+)/)?.[1] || "99");
+    return numA - numB;
+  });
 
   async function handleSave(sectionKey: string) {
     setSaving(true);
