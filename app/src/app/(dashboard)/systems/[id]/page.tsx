@@ -46,17 +46,23 @@ export default async function SystemDetailPage({
     ? JSON.parse(system.classificationReasoning)
     : null;
 
-  // Build auto-query from system context
-  const ragAutoQuery = [
-    system.riskTier !== "unclassified" ? `${system.riskTier} risk AI systems` : "",
+  // Build tier-specific auto-query for RAG sidebar
+  const tierQueries: Record<string, string> = {
+    unacceptable: "prohibited AI practices Article 5 social scoring biometric identification manipulation",
+    high: "high-risk AI systems requirements Article 6 Annex III technical documentation risk management conformity assessment",
+    limited: "transparency obligations Article 50 chatbot disclosure AI-generated content labelling emotion recognition",
+    minimal: "voluntary codes of conduct Article 95 AI literacy Article 4 minimal risk no mandatory requirements",
+    unclassified: "AI system classification risk tier Article 6 Annex III",
+  };
+
+  const dataContext = [
     system.dataTypesProcessed.includes("Biometric") ? "biometric data" : "",
     system.dataTypesProcessed.includes("Health") ? "health data AI" : "",
-    system.affectedPopulations.includes("Job applicants") ? "employment AI systems" : "",
-    system.affectedPopulations.includes("Students") ? "education AI systems" : "",
-    "EU AI Act compliance requirements",
-  ]
-    .filter(Boolean)
-    .join(" ");
+    system.affectedPopulations.includes("Job applicants") ? "employment AI recruitment" : "",
+    system.affectedPopulations.includes("Students") ? "education AI assessment" : "",
+  ].filter(Boolean).join(" ");
+
+  const ragAutoQuery = `${tierQueries[system.riskTier] || tierQueries.unclassified} ${dataContext}`.trim();
 
   return (
     <SystemDetailWithRag autoQuery={ragAutoQuery}>
