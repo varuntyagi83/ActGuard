@@ -25,7 +25,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 async function main() {
-  const dataPath = path.join(__dirname, "data", "eu-ai-act.json");
+  const dataPath = path.join(__dirname, "data", "eu-ai-act-full.json");
   const articles: ArticleData[] = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
 
   console.log(`Loaded ${articles.length} articles from EU AI Act data.`);
