@@ -49,9 +49,9 @@ export default async function SystemDetailPage({
   // Exact article references from the next steps for each tier
   const tierArticleRefs: Record<string, string[]> = {
     unacceptable: ["Article 5", "Article 6", "Article 99", "Article 11", "Article 18"],
-    high: ["Article 11", "Article 9", "Article 10", "Article 14", "Article 13", "Article 43", "Article 49", "Article 72", "Article 73"],
+    high: ["Article 11", "Article 9", "Article 10", "Article 14", "Article 13", "Article 43", "Article 49", "Article 72", "Article 73", "GDPR Article 22", "GDPR Article 35"],
     limited: ["Article 50", "Article 95", "Article 7"],
-    minimal: ["Article 95", "Article 4", "Article 7", "Article 96"],
+    minimal: ["Article 95", "Article 4", "GDPR Article 22", "GDPR Article 35", "Article 7", "Article 96"],
     unclassified: ["Article 6", "Article 5", "Annex III"],
   };
 

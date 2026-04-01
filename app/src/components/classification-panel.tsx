@@ -389,7 +389,7 @@ const NEXT_STEPS: Record<
     steps: [
       { label: "Adopt voluntary codes of conduct", articles: ["Article 95"], detail: "Consider implementing Article 95 voluntary codes of conduct to demonstrate responsible AI practices to users, investors, and regulators." },
       { label: "Implement AI literacy", articles: ["Article 4"], detail: "Per Article 4, ensure staff deploying or operating the AI system have sufficient AI literacy to understand its capabilities and limitations." },
-      { label: "Ensure GDPR compliance", articles: ["GDPR Art. 22", "GDPR Art. 35"], detail: "If processing personal data, ensure GDPR compliance including automated decision-making safeguards (GDPR Art. 22) and data protection impact assessments (GDPR Art. 35)." },
+      { label: "Ensure GDPR compliance", articles: ["GDPR Article 22", "GDPR Article 35"], detail: "If processing personal data, ensure GDPR compliance including automated decision-making safeguards (GDPR Article 22) and data protection impact assessments (GDPR Article 35)." },
       { label: "Monitor for reclassification", articles: ["Article 7", "Annex III"], detail: "Per Article 7, the Commission can amend Annex III to add new high-risk categories. Track updates — your system may be reclassified in the future." },
       { label: "Document for due diligence", articles: ["Article 95", "Article 96"], detail: "Per Article 96 Commission guidelines, maintaining documentation demonstrates responsible AI governance for investors, partners, and regulatory inquiries." },
     ],
