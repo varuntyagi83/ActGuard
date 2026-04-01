@@ -18,12 +18,18 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/systems", label: "AI Systems", icon: Cpu },
-  { href: "/incidents", label: "Incidents", icon: AlertTriangle },
-  { href: "/reports", label: "Reports", icon: FileText },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minRole: "viewer" },
+  { href: "/systems", label: "AI Systems", icon: Cpu, minRole: "viewer" },
+  { href: "/incidents", label: "Incidents", icon: AlertTriangle, minRole: "compliance_officer" },
+  { href: "/reports", label: "Reports", icon: FileText, minRole: "compliance_officer" },
+  { href: "/settings", label: "Settings", icon: Settings, minRole: "admin" },
 ];
+
+const ROLE_LEVELS: Record<string, number> = {
+  viewer: 1,
+  compliance_officer: 2,
+  admin: 3,
+};
 
 interface SidebarProps {
   user: {
@@ -52,7 +58,7 @@ export function Sidebar({ user, orgName }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navItems.map((item) => {
+        {navItems.filter((item) => (ROLE_LEVELS[user.role] || 0) >= (ROLE_LEVELS[item.minRole] || 0)).map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -84,7 +90,7 @@ export function Sidebar({ user, orgName }: SidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{user.name || "User"}</p>
-            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+            <p className="text-xs text-muted-foreground truncate capitalize">{user.role.replace("_", " ")}</p>
           </div>
         </div>
         <ThemeToggle />

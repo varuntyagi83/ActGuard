@@ -1,21 +1,19 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { requireRole } from "@/lib/rbac";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("viewer");
+    if (error) return error;
 
     const { id } = await params;
 
     const system = await db.aiSystem.findFirst({
-      where: { id, orgId: session.user.orgId },
+      where: { id, orgId: session!.user.orgId! },
       include: {
         complianceDocuments: true,
         checklists: true,
@@ -40,16 +38,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("compliance_officer");
+    if (error) return error;
 
     const { id } = await params;
     const body = await req.json();
 
     const existing = await db.aiSystem.findFirst({
-      where: { id, orgId: session.user.orgId },
+      where: { id, orgId: session!.user.orgId! },
     });
 
     if (!existing) {

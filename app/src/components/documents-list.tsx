@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileText, Plus, Loader2, Check } from "lucide-react";
+import { FileText, Plus, Loader2, Check, History, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -55,6 +55,7 @@ interface Props {
 export function DocumentsList({ systemId, systemName, riskTier, documents }: Props) {
   const router = useRouter();
   const [generating, setGenerating] = useState<string | null>(null);
+  const [expandedType, setExpandedType] = useState<string | null>(null);
 
   async function handleGenerate(docType: string) {
     setGenerating(docType);
@@ -72,16 +73,21 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
     setGenerating(null);
   }
 
-  function getLatestDoc(docType: string): Doc | undefined {
-    return documents.find((d) => d.docType === docType);
+  function getDocsForType(docType: string): Doc[] {
+    return documents
+      .filter((d) => d.docType === docType)
+      .sort((a, b) => b.version - a.version);
   }
 
   return (
     <div className="space-y-4">
       {DOC_TYPES.map((dt) => {
-        const latest = getLatestDoc(dt.type);
+        const allVersions = getDocsForType(dt.type);
+        const latest = allVersions[0];
+        const olderVersions = allVersions.slice(1);
         const isGenerating = generating === dt.type;
         const isRecommended = dt.tiers.includes(riskTier) || riskTier === "unclassified";
+        const isExpanded = expandedType === dt.type;
 
         return (
           <Card key={dt.type}>
@@ -141,10 +147,53 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
             </CardHeader>
             {latest && (
               <CardContent className="pt-0">
-                <p className="text-xs text-muted-foreground">
-                  Version {latest.version} — Generated{" "}
-                  {new Date(latest.generatedAt).toLocaleDateString()}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs text-muted-foreground">
+                    Version {latest.version} — Generated{" "}
+                    {new Date(latest.generatedAt).toLocaleDateString()}
+                  </p>
+                  {olderVersions.length > 0 && (
+                    <button
+                      onClick={() =>
+                        setExpandedType(isExpanded ? null : dt.type)
+                      }
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <History className="h-3 w-3" />
+                      {olderVersions.length} prior{" "}
+                      {olderVersions.length === 1 ? "version" : "versions"}
+                      <ChevronDown
+                        className={`h-3 w-3 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  )}
+                </div>
+                {isExpanded && olderVersions.length > 0 && (
+                  <div className="mt-3 space-y-1.5 border-t border-border pt-3">
+                    {olderVersions.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-muted/50"
+                      >
+                        <p className="text-xs text-muted-foreground">
+                          v{doc.version} — Generated{" "}
+                          {new Date(doc.generatedAt).toLocaleDateString()}
+                        </p>
+                        <Link
+                          href={`/systems/${systemId}/documents/${doc.id}`}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-xs"
+                          >
+                            View
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             )}
           </Card>

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getContextForPrompt } from "@/lib/rag";
+import { requireRole } from "@/lib/rbac";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -94,10 +94,8 @@ const SECTION_LABELS: Record<string, string> = {
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("compliance_officer");
+    if (error) return error;
 
     const { systemId, docType } = await req.json();
 
@@ -109,7 +107,7 @@ export async function POST(req: Request) {
     }
 
     const system = await db.aiSystem.findFirst({
-      where: { id: systemId, orgId: session.user.orgId },
+      where: { id: systemId, orgId: session!.user.orgId! },
     });
 
     if (!system) {

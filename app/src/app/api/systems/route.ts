@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { requireRole } from "@/lib/rbac";
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("compliance_officer");
+    if (error) return error;
 
     const body = await req.json();
     const {
@@ -33,7 +31,7 @@ export async function POST(req: Request) {
 
     const system = await db.aiSystem.create({
       data: {
-        orgId: session.user.orgId,
+        orgId: session!.user.orgId!,
         name,
         description,
         purpose: purpose || null,

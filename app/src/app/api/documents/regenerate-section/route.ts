@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getContextForPrompt } from "@/lib/rag";
+import { requireRole } from "@/lib/rbac";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("compliance_officer");
+    if (error) return error;
 
     const { documentId, sectionKey } = await req.json();
 
@@ -24,7 +22,7 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!doc || doc.aiSystem.orgId !== session.user.orgId) {
+    if (!doc || doc.aiSystem.orgId !== session!.user.orgId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { searchArticles } from "@/lib/rag";
+import { requireRole } from "@/lib/rbac";
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { error } = await requireRole("viewer");
+    if (error) return error;
 
     const { query, topK = 5 } = await req.json();
 

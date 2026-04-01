@@ -60,6 +60,13 @@ export default async function DocumentViewPage({
 
   if (!doc || doc.aiSystem.orgId !== orgId) notFound();
 
+  // Fetch all versions of this document type for version navigation
+  const allVersions = await db.complianceDocument.findMany({
+    where: { aiSystemId: doc.aiSystemId, docType: doc.docType },
+    select: { id: true, version: true, generatedAt: true },
+    orderBy: { version: "desc" },
+  });
+
   return (
     <div>
       <Link href={`/systems/${id}/documents`}>
@@ -80,6 +87,24 @@ export default async function DocumentViewPage({
             {doc.generatedAt.toLocaleDateString()}
           </p>
         </div>
+        {allVersions.length > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Version:</span>
+            <div className="flex gap-1">
+              {allVersions.map((v) => (
+                <Link key={v.id} href={`/systems/${id}/documents/${v.id}`}>
+                  <Button
+                    variant={v.id === doc.id ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 text-xs min-w-[40px]"
+                  >
+                    v{v.version}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <DocumentViewer
@@ -87,6 +112,9 @@ export default async function DocumentViewPage({
         docType={doc.docType}
         content={doc.content as Record<string, string>}
         sectionLabels={SECTION_LABELS}
+        systemName={doc.aiSystem.name}
+        docTypeLabel={DOC_TYPE_LABELS[doc.docType] || doc.docType}
+        version={doc.version}
       />
     </div>
   );

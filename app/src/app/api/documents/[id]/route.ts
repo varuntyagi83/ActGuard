@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { requireRole } from "@/lib/rbac";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("viewer");
+    if (error) return error;
 
     const { id } = await params;
 
@@ -19,7 +17,7 @@ export async function GET(
       include: { aiSystem: { select: { orgId: true, name: true } } },
     });
 
-    if (!doc || doc.aiSystem.orgId !== session.user.orgId) {
+    if (!doc || doc.aiSystem.orgId !== session!.user.orgId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
@@ -34,10 +32,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.orgId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { session, error } = await requireRole("compliance_officer");
+    if (error) return error;
 
     const { id } = await params;
     const { content } = await req.json();
@@ -47,7 +43,7 @@ export async function PATCH(
       include: { aiSystem: { select: { orgId: true } } },
     });
 
-    if (!doc || doc.aiSystem.orgId !== session.user.orgId) {
+    if (!doc || doc.aiSystem.orgId !== session!.user.orgId) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
