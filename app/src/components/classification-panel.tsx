@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Check, Edit, RotateCcw } from "lucide-react";
+import { Sparkles, Check, Edit, RotateCcw, ArrowRight, AlertTriangle, ShieldCheck, Info, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -198,7 +198,7 @@ export function ClassificationPanel({
           {/* Reasoning */}
           <div>
             <h3 className="text-sm font-medium mb-2">Reasoning</h3>
-            <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-4">
+            <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
               {classification.reasoning}
             </p>
           </div>
@@ -267,6 +267,9 @@ export function ClassificationPanel({
         </CardContent>
       </Card>
 
+      {/* Next Steps based on risk tier */}
+      <NextStepsCard tier={classification.tier} />
+
       {/* Override panel */}
       {overriding && (
         <Card className="border-orange-200">
@@ -315,5 +318,116 @@ export function ClassificationPanel({
         </Card>
       )}
     </div>
+  );
+}
+
+const NEXT_STEPS: Record<
+  string,
+  {
+    icon: typeof Ban;
+    color: string;
+    bg: string;
+    title: string;
+    summary: string;
+    steps: { label: string; detail: string }[];
+  }
+> = {
+  unacceptable: {
+    icon: Ban,
+    color: "text-red-700 dark:text-red-400",
+    bg: "bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800",
+    title: "This AI system is prohibited under the EU AI Act",
+    summary:
+      "Systems classified as unacceptable risk under Article 5 cannot be placed on the market or put into service in the EU. Fines for violations can reach EUR 35 million or 7% of global annual turnover.",
+    steps: [
+      { label: "Cease deployment", detail: "Immediately stop deploying this system in the EU market." },
+      { label: "Assess alternatives", detail: "Determine if the system can be redesigned to fall outside prohibited categories." },
+      { label: "Seek legal counsel", detail: "Consult with EU AI Act legal specialists to confirm classification and explore exemptions (e.g., law enforcement exceptions under Article 5(1)(d))." },
+      { label: "Document decision", detail: "Record your compliance decision and reasoning for audit purposes." },
+    ],
+  },
+  high: {
+    icon: AlertTriangle,
+    color: "text-orange-700 dark:text-orange-400",
+    bg: "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800",
+    title: "High-risk: Full compliance required before August 2, 2026",
+    summary:
+      "High-risk AI systems must meet all requirements in Chapter III, Section 2 (Articles 8-15) before they can be placed on the EU market. This includes technical documentation, risk management, data governance, and conformity assessment.",
+    steps: [
+      { label: "Generate technical documentation", detail: "Create Article 11 technical documentation covering system design, development process, and performance metrics." },
+      { label: "Establish risk management system", detail: "Implement an Article 9 continuous risk management process covering identification, evaluation, mitigation, and monitoring." },
+      { label: "Complete data governance record", detail: "Document Article 10 data governance practices: collection methods, bias detection, representativeness assessment." },
+      { label: "Implement human oversight", detail: "Ensure Article 14 human oversight measures: ability to understand, monitor, intervene, and override the AI system." },
+      { label: "Conduct conformity assessment", detail: "Complete Article 43 conformity assessment (internal control for most Annex III systems) and prepare EU declaration of conformity." },
+      { label: "Register in EU database", detail: "Register the system in the Article 71 EU database before placing it on the market." },
+      { label: "Set up post-market monitoring", detail: "Establish Article 72 post-market monitoring and Article 73 serious incident reporting procedures." },
+    ],
+  },
+  limited: {
+    icon: Info,
+    color: "text-yellow-700 dark:text-yellow-400",
+    bg: "bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800",
+    title: "Limited risk: Transparency obligations apply",
+    summary:
+      "Limited risk systems must comply with Article 50 transparency requirements. Users must be informed they are interacting with an AI system, and AI-generated content must be properly labelled.",
+    steps: [
+      { label: "Disclose AI interaction", detail: "Ensure users are clearly informed when they are interacting with an AI system (e.g., chatbot disclosure)." },
+      { label: "Label AI-generated content", detail: "Mark synthetic audio, image, video, or text content as AI-generated in a machine-readable format." },
+      { label: "Deep fake disclosure", detail: "If generating/manipulating media, disclose that content has been artificially generated or manipulated." },
+      { label: "Emotion recognition notice", detail: "If using emotion recognition or biometric categorisation, inform exposed individuals of the system's operation." },
+      { label: "Consider voluntary compliance", detail: "While not mandatory, consider adopting high-risk requirements (Article 95 codes of conduct) to build trust and prepare for potential reclassification." },
+    ],
+  },
+  minimal: {
+    icon: ShieldCheck,
+    color: "text-green-700 dark:text-green-400",
+    bg: "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800",
+    title: "Minimal risk: No mandatory requirements",
+    summary:
+      "Minimal risk AI systems have no mandatory compliance requirements under the EU AI Act. However, voluntary measures are encouraged under Article 95, and you should still be aware of your obligations under other regulations (GDPR, sector-specific rules).",
+    steps: [
+      { label: "Adopt voluntary codes of conduct", detail: "Consider implementing Article 95 voluntary codes of conduct to demonstrate responsible AI practices to users and investors." },
+      { label: "Ensure GDPR compliance", detail: "If processing personal data, ensure compliance with GDPR (data protection impact assessment, lawful basis, data subject rights)." },
+      { label: "Monitor for reclassification", detail: "Track updates to Annex III — the Commission can amend the high-risk list. Your system may be reclassified in the future." },
+      { label: "Implement AI literacy", detail: "Per Article 4, ensure staff have sufficient AI literacy to understand the system's capabilities and limitations." },
+      { label: "Document for due diligence", detail: "Even without mandatory requirements, maintaining documentation demonstrates responsible AI governance for investors, partners, and clients." },
+    ],
+  },
+};
+
+function NextStepsCard({ tier }: { tier: string }) {
+  const config = NEXT_STEPS[tier];
+  if (!config) return null;
+
+  const Icon = config.icon;
+
+  return (
+    <Card className={`${config.bg}`}>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <Icon className={`h-5 w-5 ${config.color}`} />
+          <div>
+            <CardTitle className="text-base">{config.title}</CardTitle>
+            <CardDescription className="mt-1">{config.summary}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <h4 className="text-sm font-semibold mb-3">Recommended next steps</h4>
+        <div className="space-y-3">
+          {config.steps.map((step, i) => (
+            <div key={i} className="flex gap-3">
+              <div className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold shrink-0 ${config.color} bg-white dark:bg-gray-900 border`}>
+                {i + 1}
+              </div>
+              <div>
+                <p className="text-sm font-medium">{step.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{step.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
