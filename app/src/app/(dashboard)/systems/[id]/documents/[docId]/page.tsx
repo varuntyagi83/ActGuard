@@ -42,6 +42,33 @@ const SECTION_LABELS: Record<string, string> = {
   bias_examination_and_detection: "6. Bias Examination and Detection",
   gap_identification_and_mitigation: "7. Gap Identification and Mitigation",
   data_protection_impact_integration: "8. Data Protection Impact Integration",
+  // Conformity Assessment
+  assessment_scope_and_objectives: "1. Assessment Scope and Objectives",
+  applicable_requirements: "2. Applicable Requirements",
+  quality_management_system_review: "3. Quality Management System Review",
+  technical_documentation_review: "4. Technical Documentation Review",
+  design_and_development_process_audit: "5. Design and Development Process Audit",
+  post_market_monitoring_review: "6. Post-Market Monitoring Review",
+  compliance_findings_and_gaps: "7. Compliance Findings and Gaps",
+  declaration_of_conformity_draft: "8. Declaration of Conformity Draft",
+  // Transparency Information
+  system_identity_and_provider: "1. System Identity and Provider",
+  intended_purpose_and_use_cases: "2. Intended Purpose and Use Cases",
+  capabilities_and_limitations: "3. Capabilities and Limitations",
+  human_oversight_instructions: "4. Human Oversight Instructions",
+  input_data_specifications: "5. Input Data Specifications",
+  output_interpretation_guidance: "6. Output Interpretation Guidance",
+  risk_communication_to_users: "7. Risk Communication to Users",
+  contact_and_reporting_channels: "8. Contact and Reporting Channels",
+  // Human Oversight Plan
+  oversight_framework_and_objectives: "1. Oversight Framework and Objectives",
+  roles_and_responsibilities: "2. Roles and Responsibilities",
+  competency_requirements_and_training: "3. Competency Requirements and Training",
+  human_machine_interface_design: "4. Human-Machine Interface Design",
+  intervention_and_override_procedures: "5. Intervention and Override Procedures",
+  decision_review_and_appeal_process: "6. Decision Review and Appeal Process",
+  monitoring_and_escalation_protocols: "7. Monitoring and Escalation Protocols",
+  oversight_effectiveness_evaluation: "8. Oversight Effectiveness Evaluation",
 };
 
 export default async function DocumentViewPage({

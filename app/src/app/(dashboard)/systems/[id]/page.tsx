@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { ClassificationPanel } from "@/components/classification-panel";
 import { SystemDetailWithRag } from "@/components/system-detail-with-rag";
+import { ComplianceChecklist } from "@/components/compliance-checklist";
 
 const riskColors: Record<string, string> = {
   unacceptable: "bg-red-500 text-white",
@@ -86,6 +87,7 @@ export default async function SystemDetailPage({
           <TabsTrigger value="documents">
             Documents ({system.complianceDocuments.length})
           </TabsTrigger>
+          <TabsTrigger value="checklist">Checklist</TabsTrigger>
         </TabsList>
 
         {/* Classification Tab */}
@@ -192,6 +194,11 @@ export default async function SystemDetailPage({
               </Button>
             </Link>
           </div>
+        </TabsContent>
+
+        {/* Checklist Tab */}
+        <TabsContent value="checklist">
+          <ComplianceChecklist systemId={system.id} />
         </TabsContent>
       </Tabs>
     </SystemDetailWithRag>

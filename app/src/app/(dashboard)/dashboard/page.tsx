@@ -5,10 +5,10 @@ import {
   AlertTriangle,
   FileText,
   Clock,
-  Shield,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DashboardCharts } from "@/components/dashboard-charts";
 
 const ENFORCEMENT_DATE = new Date("2026-08-02T00:00:00Z");
 
@@ -18,13 +18,6 @@ function getDaysUntilEnforcement() {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-const riskColors: Record<string, string> = {
-  unacceptable: "bg-red-100 text-red-800",
-  high: "bg-orange-100 text-orange-800",
-  limited: "bg-yellow-100 text-yellow-800",
-  minimal: "bg-green-100 text-green-800",
-  unclassified: "bg-gray-100 text-gray-800",
-};
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -50,6 +43,23 @@ export default async function DashboardPage() {
     },
     {} as Record<string, number>
   );
+
+  // Count how many systems have at least one doc per type
+  const docsBySystem = documents.reduce(
+    (acc, d) => {
+      const key = `${d.aiSystemId}:${d.docType}`;
+      if (!acc.has(key)) {
+        acc.set(key, true);
+      }
+      return acc;
+    },
+    new Map<string, boolean>()
+  );
+  const docTypeCounts: Record<string, number> = {};
+  for (const key of docsBySystem.keys()) {
+    const docType = key.split(":")[1];
+    docTypeCounts[docType] = (docTypeCounts[docType] || 0) + 1;
+  }
 
   return (
     <div>
@@ -125,39 +135,15 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* Risk tier breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Systems by Risk Tier
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {systems.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No AI systems registered yet. Go to{" "}
-                <a href="/systems" className="text-blue-600 hover:underline">
-                  AI Systems
-                </a>{" "}
-                to register your first system.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {Object.entries(riskTierCounts).map(([tier, count]) => (
-                  <div key={tier} className="flex items-center justify-between">
-                    <Badge className={riskColors[tier] || riskColors.unclassified}>
-                      {tier.charAt(0).toUpperCase() + tier.slice(1)}
-                    </Badge>
-                    <span className="text-sm font-medium">{count}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Charts */}
+      <DashboardCharts
+        riskTierCounts={riskTierCounts}
+        docTypeCounts={docTypeCounts}
+        systemCount={systems.length}
+      />
 
+      {/* Recent Incidents */}
+      <div className="mt-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">

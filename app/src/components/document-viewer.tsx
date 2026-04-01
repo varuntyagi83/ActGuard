@@ -450,7 +450,18 @@ export function DocumentViewer({
           className="gap-1.5"
         >
           <Download className="h-3.5 w-3.5" />
-          Export PDF
+          Print PDF
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            window.open(`/api/documents/export-pdf?documentId=${documentId}`, "_blank");
+          }}
+          className="gap-1.5"
+        >
+          <Download className="h-3.5 w-3.5" />
+          Download PDF
         </Button>
       </div>
 

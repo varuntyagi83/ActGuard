@@ -36,6 +36,27 @@ const DOC_TYPES = [
     description: "Data collection, preprocessing, bias detection, representativeness, data quality measures.",
     tiers: ["high"],
   },
+  {
+    type: "conformity_assessment",
+    label: "Conformity Assessment",
+    article: "Article 43",
+    description: "Assessment of compliance with EU AI Act requirements, quality management review, conformity declaration.",
+    tiers: ["high"],
+  },
+  {
+    type: "transparency_info",
+    label: "Transparency Information",
+    article: "Article 13",
+    description: "System capabilities, limitations, intended use, human oversight instructions, output interpretation guidance.",
+    tiers: ["high", "limited"],
+  },
+  {
+    type: "human_oversight_plan",
+    label: "Human Oversight Plan",
+    article: "Article 14",
+    description: "Oversight framework, intervention procedures, competency requirements, decision review processes.",
+    tiers: ["high"],
+  },
 ];
 
 interface Doc {

@@ -62,6 +62,60 @@ Return a JSON object with these exact section keys:`,
       "data_protection_impact_integration",
     ],
   },
+  conformity_assessment: {
+    ragQuery: "Article 43 conformity assessment procedures notified bodies Annex VI Annex VII",
+    systemPrompt: `You are an EU AI Act conformity assessment specialist. Generate a conformity assessment document per Article 43, Annex VI, and Annex VII requirements for the following AI system.
+
+The assessment must evaluate whether the system meets all applicable requirements of the regulation. Be specific about the assessment methodology, evidence gathered, and compliance gaps identified. Reference the system's actual risk tier, data practices, and deployment context.
+
+Return a JSON object with these exact section keys:`,
+    sections: [
+      "assessment_scope_and_objectives",
+      "applicable_requirements",
+      "quality_management_system_review",
+      "technical_documentation_review",
+      "design_and_development_process_audit",
+      "post_market_monitoring_review",
+      "compliance_findings_and_gaps",
+      "declaration_of_conformity_draft",
+    ],
+  },
+  transparency_info: {
+    ragQuery: "Article 13 transparency provision information to deployers Article 50 transparency obligations",
+    systemPrompt: `You are an EU AI Act transparency specialist. Generate a transparency information document per Article 13 and Article 50 requirements for the following AI system.
+
+The document must clearly communicate the system's capabilities, limitations, and intended use to deployers and end-users. Include specific instructions for human oversight and interpretation of outputs. Be concrete based on the system's actual functionality.
+
+Return a JSON object with these exact section keys:`,
+    sections: [
+      "system_identity_and_provider",
+      "intended_purpose_and_use_cases",
+      "capabilities_and_limitations",
+      "human_oversight_instructions",
+      "input_data_specifications",
+      "output_interpretation_guidance",
+      "risk_communication_to_users",
+      "contact_and_reporting_channels",
+    ],
+  },
+  human_oversight_plan: {
+    ragQuery: "Article 14 human oversight measures appropriate human-machine interface tools",
+    systemPrompt: `You are an EU AI Act human oversight specialist. Generate a human oversight plan per Article 14 requirements for the following AI system.
+
+The plan must define specific oversight measures proportionate to the system's risk level. Include concrete procedures for human intervention, override mechanisms, and decision-review processes based on the system's actual deployment context and affected populations.
+
+Return a JSON object with these exact section keys:`,
+    sections: [
+      "oversight_framework_and_objectives",
+      "roles_and_responsibilities",
+      "competency_requirements_and_training",
+      "human_machine_interface_design",
+      "intervention_and_override_procedures",
+      "decision_review_and_appeal_process",
+      "monitoring_and_escalation_protocols",
+      "oversight_effectiveness_evaluation",
+    ],
+  },
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -90,6 +144,33 @@ const SECTION_LABELS: Record<string, string> = {
   bias_examination_and_detection: "Bias examination and detection",
   gap_identification_and_mitigation: "Gap identification and mitigation",
   data_protection_impact_integration: "Data protection impact integration",
+  // Conformity Assessment (Article 43)
+  assessment_scope_and_objectives: "Assessment scope and objectives",
+  applicable_requirements: "Applicable requirements",
+  quality_management_system_review: "Quality management system review",
+  technical_documentation_review: "Technical documentation review",
+  design_and_development_process_audit: "Design and development process audit",
+  post_market_monitoring_review: "Post-market monitoring review",
+  compliance_findings_and_gaps: "Compliance findings and gaps",
+  declaration_of_conformity_draft: "Declaration of conformity draft",
+  // Transparency Information (Article 13 + 50)
+  system_identity_and_provider: "System identity and provider",
+  intended_purpose_and_use_cases: "Intended purpose and use cases",
+  capabilities_and_limitations: "Capabilities and limitations",
+  human_oversight_instructions: "Human oversight instructions",
+  input_data_specifications: "Input data specifications",
+  output_interpretation_guidance: "Output interpretation guidance",
+  risk_communication_to_users: "Risk communication to users",
+  contact_and_reporting_channels: "Contact and reporting channels",
+  // Human Oversight Plan (Article 14)
+  oversight_framework_and_objectives: "Oversight framework and objectives",
+  roles_and_responsibilities: "Roles and responsibilities",
+  competency_requirements_and_training: "Competency requirements and training",
+  human_machine_interface_design: "Human-machine interface design",
+  intervention_and_override_procedures: "Intervention and override procedures",
+  decision_review_and_appeal_process: "Decision review and appeal process",
+  monitoring_and_escalation_protocols: "Monitoring and escalation protocols",
+  oversight_effectiveness_evaluation: "Oversight effectiveness evaluation",
 };
 
 export async function POST(req: Request) {
