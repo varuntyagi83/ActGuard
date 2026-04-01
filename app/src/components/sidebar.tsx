@@ -30,17 +30,21 @@ interface SidebarProps {
     email?: string | null;
     role: string;
   };
+  orgName: string;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, orgName }: SidebarProps) {
   const pathname = usePathname();
 
   return (
     <div className="flex flex-col w-64 bg-white border-r h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-6 py-5">
-        <Shield className="h-6 w-6 text-blue-600" />
-        <span className="text-lg font-bold">ActGuard</span>
+      {/* Logo + Org */}
+      <div className="px-6 py-5">
+        <div className="flex items-center gap-2">
+          <Shield className="h-6 w-6 text-blue-600" />
+          <span className="text-lg font-bold">ActGuard</span>
+        </div>
+        <p className="text-xs text-muted-foreground mt-1 truncate">{orgName}</p>
       </div>
 
       <Separator />

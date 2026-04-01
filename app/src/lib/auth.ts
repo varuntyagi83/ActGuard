@@ -56,6 +56,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.role = dbUser.role;
         }
       }
+
+      // Re-fetch orgId on every request if it's still null
+      // This handles the case where org is created after sign-in
+      if (!token.orgId && token.userId) {
+        const dbUser = await db.user.findUnique({
+          where: { id: token.userId as string },
+          select: { orgId: true, role: true },
+        });
+        if (dbUser?.orgId) {
+          token.orgId = dbUser.orgId;
+          token.role = dbUser.role;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
