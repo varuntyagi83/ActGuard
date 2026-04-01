@@ -329,7 +329,7 @@ const NEXT_STEPS: Record<
     bg: string;
     title: string;
     summary: string;
-    steps: { label: string; detail: string }[];
+    steps: { label: string; articles: string[]; detail: string }[];
   }
 > = {
   unacceptable: {
@@ -338,12 +338,12 @@ const NEXT_STEPS: Record<
     bg: "bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800",
     title: "This AI system is prohibited under the EU AI Act",
     summary:
-      "Systems classified as unacceptable risk under Article 5 cannot be placed on the market or put into service in the EU. Fines for violations can reach EUR 35 million or 7% of global annual turnover.",
+      "Systems classified as unacceptable risk under Article 5 cannot be placed on the market or put into service in the EU. Fines for violations can reach EUR 35 million or 7% of global annual turnover (Article 99).",
     steps: [
-      { label: "Cease deployment", detail: "Immediately stop deploying this system in the EU market." },
-      { label: "Assess alternatives", detail: "Determine if the system can be redesigned to fall outside prohibited categories." },
-      { label: "Seek legal counsel", detail: "Consult with EU AI Act legal specialists to confirm classification and explore exemptions (e.g., law enforcement exceptions under Article 5(1)(d))." },
-      { label: "Document decision", detail: "Record your compliance decision and reasoning for audit purposes." },
+      { label: "Cease deployment", articles: ["Article 5"], detail: "Immediately stop deploying this system in the EU market. Article 5 explicitly prohibits this category of AI practice." },
+      { label: "Assess alternatives", articles: ["Article 6", "Annex III"], detail: "Determine if the system can be redesigned to fall outside prohibited categories and into a lower risk tier under Article 6." },
+      { label: "Seek legal counsel", articles: ["Article 5(1)(d)", "Article 99"], detail: "Consult with EU AI Act legal specialists to confirm classification and explore narrow exemptions (e.g., law enforcement exceptions). Penalties under Article 99 reach EUR 35M." },
+      { label: "Document decision", articles: ["Article 11", "Article 18"], detail: "Record your compliance decision and reasoning per Article 18 documentation keeping requirements for audit purposes." },
     ],
   },
   high: {
@@ -352,15 +352,16 @@ const NEXT_STEPS: Record<
     bg: "bg-orange-50 dark:bg-orange-950 border-orange-200 dark:border-orange-800",
     title: "High-risk: Full compliance required before August 2, 2026",
     summary:
-      "High-risk AI systems must meet all requirements in Chapter III, Section 2 (Articles 8-15) before they can be placed on the EU market. This includes technical documentation, risk management, data governance, and conformity assessment.",
+      "High-risk AI systems must meet all requirements in Chapter III, Section 2 (Articles 8-15) before placement on the EU market. This includes technical documentation, risk management, data governance, and conformity assessment.",
     steps: [
-      { label: "Generate technical documentation", detail: "Create Article 11 technical documentation covering system design, development process, and performance metrics." },
-      { label: "Establish risk management system", detail: "Implement an Article 9 continuous risk management process covering identification, evaluation, mitigation, and monitoring." },
-      { label: "Complete data governance record", detail: "Document Article 10 data governance practices: collection methods, bias detection, representativeness assessment." },
-      { label: "Implement human oversight", detail: "Ensure Article 14 human oversight measures: ability to understand, monitor, intervene, and override the AI system." },
-      { label: "Conduct conformity assessment", detail: "Complete Article 43 conformity assessment (internal control for most Annex III systems) and prepare EU declaration of conformity." },
-      { label: "Register in EU database", detail: "Register the system in the Article 71 EU database before placing it on the market." },
-      { label: "Set up post-market monitoring", detail: "Establish Article 72 post-market monitoring and Article 73 serious incident reporting procedures." },
+      { label: "Generate technical documentation", articles: ["Article 11", "Annex IV"], detail: "Create technical documentation covering system design, development process, performance metrics, and risk management per Article 11 and the template in Annex IV." },
+      { label: "Establish risk management system", articles: ["Article 9"], detail: "Implement a continuous, iterative risk management process per Article 9: identification, estimation, evaluation, mitigation measures, and residual risk assessment." },
+      { label: "Complete data governance record", articles: ["Article 10"], detail: "Document data governance practices per Article 10: collection methods, preprocessing, bias detection, representativeness assessment, and data quality measures." },
+      { label: "Implement human oversight", articles: ["Article 14"], detail: "Ensure human oversight measures per Article 14: ability to understand, monitor, correctly interpret outputs, intervene, and override the AI system." },
+      { label: "Ensure transparency", articles: ["Article 13"], detail: "Provide instructions for use per Article 13: system capabilities, limitations, accuracy metrics, intended purpose, and maintenance requirements." },
+      { label: "Conduct conformity assessment", articles: ["Article 43", "Annex VI"], detail: "Complete conformity assessment per Article 43 (internal control procedure in Annex VI for most Annex III systems) and draw up EU declaration of conformity." },
+      { label: "Register in EU database", articles: ["Article 49", "Article 71"], detail: "Register the system in the EU database per Article 71 with the information required by Article 49 before placing it on the market." },
+      { label: "Set up incident reporting", articles: ["Article 72", "Article 73"], detail: "Establish post-market monitoring per Article 72 and serious incident reporting procedures per Article 73 (report within 15 days of awareness)." },
     ],
   },
   limited: {
@@ -371,11 +372,11 @@ const NEXT_STEPS: Record<
     summary:
       "Limited risk systems must comply with Article 50 transparency requirements. Users must be informed they are interacting with an AI system, and AI-generated content must be properly labelled.",
     steps: [
-      { label: "Disclose AI interaction", detail: "Ensure users are clearly informed when they are interacting with an AI system (e.g., chatbot disclosure)." },
-      { label: "Label AI-generated content", detail: "Mark synthetic audio, image, video, or text content as AI-generated in a machine-readable format." },
-      { label: "Deep fake disclosure", detail: "If generating/manipulating media, disclose that content has been artificially generated or manipulated." },
-      { label: "Emotion recognition notice", detail: "If using emotion recognition or biometric categorisation, inform exposed individuals of the system's operation." },
-      { label: "Consider voluntary compliance", detail: "While not mandatory, consider adopting high-risk requirements (Article 95 codes of conduct) to build trust and prepare for potential reclassification." },
+      { label: "Disclose AI interaction", articles: ["Article 50(1)"], detail: "Per Article 50(1), ensure users are clearly informed when they are interacting with an AI system, unless obvious from context." },
+      { label: "Label AI-generated content", articles: ["Article 50(2)"], detail: "Per Article 50(2), mark synthetic audio, image, video, or text content as AI-generated in a machine-readable format." },
+      { label: "Deep fake disclosure", articles: ["Article 50(4)"], detail: "Per Article 50(4), if generating or manipulating media, disclose that content has been artificially generated or manipulated." },
+      { label: "Emotion recognition notice", articles: ["Article 50(3)"], detail: "Per Article 50(3), if using emotion recognition or biometric categorisation, inform exposed individuals of the system's operation." },
+      { label: "Consider voluntary compliance", articles: ["Article 95", "Article 69"], detail: "While not mandatory, consider adopting high-risk requirements via Article 95 codes of conduct to build trust and prepare for potential reclassification under Article 7." },
     ],
   },
   minimal: {
@@ -386,11 +387,11 @@ const NEXT_STEPS: Record<
     summary:
       "Minimal risk AI systems have no mandatory compliance requirements under the EU AI Act. However, voluntary measures are encouraged under Article 95, and you should still be aware of your obligations under other regulations (GDPR, sector-specific rules).",
     steps: [
-      { label: "Adopt voluntary codes of conduct", detail: "Consider implementing Article 95 voluntary codes of conduct to demonstrate responsible AI practices to users and investors." },
-      { label: "Ensure GDPR compliance", detail: "If processing personal data, ensure compliance with GDPR (data protection impact assessment, lawful basis, data subject rights)." },
-      { label: "Monitor for reclassification", detail: "Track updates to Annex III — the Commission can amend the high-risk list. Your system may be reclassified in the future." },
-      { label: "Implement AI literacy", detail: "Per Article 4, ensure staff have sufficient AI literacy to understand the system's capabilities and limitations." },
-      { label: "Document for due diligence", detail: "Even without mandatory requirements, maintaining documentation demonstrates responsible AI governance for investors, partners, and clients." },
+      { label: "Adopt voluntary codes of conduct", articles: ["Article 95"], detail: "Consider implementing Article 95 voluntary codes of conduct to demonstrate responsible AI practices to users, investors, and regulators." },
+      { label: "Implement AI literacy", articles: ["Article 4"], detail: "Per Article 4, ensure staff deploying or operating the AI system have sufficient AI literacy to understand its capabilities and limitations." },
+      { label: "Ensure GDPR compliance", articles: ["GDPR Art. 22", "GDPR Art. 35"], detail: "If processing personal data, ensure GDPR compliance including automated decision-making safeguards (GDPR Art. 22) and data protection impact assessments (GDPR Art. 35)." },
+      { label: "Monitor for reclassification", articles: ["Article 7", "Annex III"], detail: "Per Article 7, the Commission can amend Annex III to add new high-risk categories. Track updates — your system may be reclassified in the future." },
+      { label: "Document for due diligence", articles: ["Article 95", "Article 96"], detail: "Per Article 96 Commission guidelines, maintaining documentation demonstrates responsible AI governance for investors, partners, and regulatory inquiries." },
     ],
   },
 };
@@ -414,7 +415,7 @@ function NextStepsCard({ tier }: { tier: string }) {
       </CardHeader>
       <CardContent>
         <h4 className="text-sm font-semibold mb-3">Recommended next steps</h4>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {config.steps.map((step, i) => (
             <div key={i} className="flex gap-3">
               <div className={`flex items-center justify-center h-6 w-6 rounded-full text-xs font-bold shrink-0 ${config.color} bg-white dark:bg-gray-900 border`}>
@@ -422,7 +423,17 @@ function NextStepsCard({ tier }: { tier: string }) {
               </div>
               <div>
                 <p className="text-sm font-medium">{step.label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{step.detail}</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {step.articles.map((article) => (
+                    <span
+                      key={article}
+                      className="inline-flex items-center text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white/60 dark:bg-gray-800/60 border text-blue-700 dark:text-blue-400"
+                    >
+                      {article}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">{step.detail}</p>
               </div>
             </div>
           ))}

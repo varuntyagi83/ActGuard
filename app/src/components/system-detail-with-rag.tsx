@@ -7,10 +7,10 @@ import { RagSidebar } from "@/components/rag-sidebar";
 
 interface Props {
   children: React.ReactNode;
-  autoQuery: string;
+  articleRefs: string[];
 }
 
-export function SystemDetailWithRag({ children, autoQuery }: Props) {
+export function SystemDetailWithRag({ children, articleRefs }: Props) {
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
@@ -42,7 +42,7 @@ export function SystemDetailWithRag({ children, autoQuery }: Props) {
       </div>
 
       {/* RAG sidebar */}
-      {showSidebar && <RagSidebar autoQuery={autoQuery} />}
+      {showSidebar && <RagSidebar articleRefs={articleRefs} />}
     </div>
   );
 }

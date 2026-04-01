@@ -46,26 +46,19 @@ export default async function SystemDetailPage({
     ? JSON.parse(system.classificationReasoning)
     : null;
 
-  // Build tier-specific auto-query for RAG sidebar
-  const tierQueries: Record<string, string> = {
-    unacceptable: "prohibited AI practices Article 5 social scoring biometric identification manipulation",
-    high: "high-risk AI systems requirements Article 6 Annex III technical documentation risk management conformity assessment",
-    limited: "transparency obligations Article 50 chatbot disclosure AI-generated content labelling emotion recognition",
-    minimal: "voluntary codes of conduct Article 95 AI literacy Article 4 minimal risk no mandatory requirements",
-    unclassified: "AI system classification risk tier Article 6 Annex III",
+  // Exact article references from the next steps for each tier
+  const tierArticleRefs: Record<string, string[]> = {
+    unacceptable: ["Article 5", "Article 6", "Article 99", "Article 11", "Article 18"],
+    high: ["Article 11", "Article 9", "Article 10", "Article 14", "Article 13", "Article 43", "Article 49", "Article 72", "Article 73"],
+    limited: ["Article 50", "Article 95", "Article 7"],
+    minimal: ["Article 95", "Article 4", "Article 7", "Article 96"],
+    unclassified: ["Article 6", "Article 5", "Annex III"],
   };
 
-  const dataContext = [
-    system.dataTypesProcessed.includes("Biometric") ? "biometric data" : "",
-    system.dataTypesProcessed.includes("Health") ? "health data AI" : "",
-    system.affectedPopulations.includes("Job applicants") ? "employment AI recruitment" : "",
-    system.affectedPopulations.includes("Students") ? "education AI assessment" : "",
-  ].filter(Boolean).join(" ");
-
-  const ragAutoQuery = `${tierQueries[system.riskTier] || tierQueries.unclassified} ${dataContext}`.trim();
+  const articleRefs = tierArticleRefs[system.riskTier] || tierArticleRefs.unclassified;
 
   return (
-    <SystemDetailWithRag autoQuery={ragAutoQuery}>
+    <SystemDetailWithRag articleRefs={articleRefs}>
       <Link href="/systems">
         <Button variant="ghost" className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
