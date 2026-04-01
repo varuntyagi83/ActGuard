@@ -78,6 +78,7 @@ model User {
   complianceDocuments ComplianceDocument[]
   incidents           Incident[]
   timelineEntries     IncidentTimeline[]
+  incidentReports     IncidentReport[]
 
   @@map("users")
 }
@@ -97,6 +98,7 @@ model AiSystem {
   humanOversightLevel     String?  @map("human_oversight_level")
   scaleOfDeployment       String?  @map("scale_of_deployment")
   integrationDescription  String?  @map("integration_description") @db.Text
+  euDatabaseId            String?  @map("eu_database_id")
   status                  String   @default("draft")
   createdAt               DateTime @default(now()) @map("created_at")
   updatedAt               DateTime @updatedAt @map("updated_at")
@@ -133,6 +135,7 @@ model Incident {
   title             String
   description       String   @db.Text
   severity          String
+  incidentType      String?  @map("incident_type")
   incidentDate      DateTime @map("incident_date")
   reportedAt        DateTime? @map("reported_at")
   reportingDeadline DateTime @map("reporting_deadline")
@@ -150,6 +153,7 @@ model Incident {
   aiSystem     AiSystem?     @relation(fields: [aiSystemId], references: [id])
   creator      User?         @relation(fields: [createdBy], references: [id])
   timeline     IncidentTimeline[]
+  reports      IncidentReport[]
 
   @@index([orgId, status, reportingDeadline])
   @@map("incidents")
@@ -167,6 +171,24 @@ model IncidentTimeline {
   creator  User?    @relation(fields: [createdBy], references: [id])
 
   @@map("incident_timeline")
+}
+
+model IncidentReport {
+  id           String    @id @default(cuid())
+  incidentId   String    @map("incident_id")
+  reportType   String    @map("report_type")
+  reportNumber Int       @map("report_number")
+  content      Json
+  submittedAt  DateTime? @map("submitted_at")
+  submittedTo  String?   @map("submitted_to")
+  submittedBy  String?   @map("submitted_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  incident  Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  submitter User?    @relation(fields: [submittedBy], references: [id])
+
+  @@index([incidentId, reportType])
+  @@map("incident_reports")
 }
 
 model ComplianceChecklist {

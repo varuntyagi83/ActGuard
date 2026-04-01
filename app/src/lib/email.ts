@@ -68,6 +68,44 @@ export async function sendDeadlineAlertEmail(
   });
 }
 
+export async function sendIncidentReportEmail(
+  authorityEmail: string,
+  incidentTitle: string,
+  reportType: string,
+  pdfBuffer: Buffer
+) {
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: authorityEmail,
+    subject: `[EU AI Act - Art. 73] Incident Report: ${incidentTitle} (${reportType})`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+        <h2 style="color:#1a1a1a;">EU AI Act - Article 73 Incident Report</h2>
+        <p style="color:#555;line-height:1.6;">
+          This is a formal notification under <strong>Article 73 of the EU AI Act</strong>.
+          Please find attached the incident report for the following:
+        </p>
+        <div style="border:1px solid #ddd;border-radius:6px;padding:16px;margin:16px 0;">
+          <p style="margin:0 0 8px;"><strong>Incident:</strong> ${incidentTitle}</p>
+          <p style="margin:0;"><strong>Report type:</strong> ${reportType}</p>
+        </div>
+        <p style="color:#555;line-height:1.6;">
+          The full report is attached as a PDF document. Please review and acknowledge receipt
+          at your earliest convenience.
+        </p>
+        <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+        <p style="color:#aaa;font-size:11px;">ActGuard — EU AI Act Compliance Suite</p>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: "incident-report.pdf",
+        content: pdfBuffer,
+      },
+    ],
+  });
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
 

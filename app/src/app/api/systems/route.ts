@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       deploymentMemberStates,
       integrationDescription,
       humanOversightLevel,
+      euDatabaseId,
       classify,
     } = body;
 
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
         deploymentMemberStates: deploymentMemberStates || [],
         integrationDescription: integrationDescription || null,
         humanOversightLevel: humanOversightLevel || null,
+        euDatabaseId: euDatabaseId || null,
         status: "draft",
       },
     });

@@ -67,6 +67,7 @@ export default function NewIncidentPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState("");
+  const [incidentType, setIncidentType] = useState("");
   const [incidentDate, setIncidentDate] = useState(
     new Date().toISOString().slice(0, 16)
   );
@@ -109,6 +110,7 @@ export default function NewIncidentPage() {
           title,
           description,
           severity,
+          incidentType,
           incidentDate,
           aiSystemId: aiSystemId || null,
           memberState: memberState || null,
@@ -129,8 +131,14 @@ export default function NewIncidentPage() {
     setLoading(false);
   }
 
+  const deadlineDaysMap: Record<string, number> = {
+    critical_infrastructure: 2,
+    death_involvement: 10,
+    other_serious: 15,
+  };
+  const deadlineDays = deadlineDaysMap[incidentType] || 2;
   const deadlineDate = new Date(
-    new Date(incidentDate).getTime() + 24 * 60 * 60 * 1000
+    new Date(incidentDate).getTime() + deadlineDays * 24 * 60 * 60 * 1000
   );
 
   return (
@@ -149,8 +157,8 @@ export default function NewIncidentPage() {
             Report Incident
           </h1>
           <p className="text-muted-foreground mt-1">
-            Report an AI system incident per Article 72. A 24-hour reporting
-            deadline will be automatically set.
+            Report an AI system incident per Article 73. A reporting
+            deadline will be automatically set based on incident type.
           </p>
         </div>
 
@@ -192,7 +200,7 @@ export default function NewIncidentPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="severity">Severity *</Label>
                   <Select
@@ -218,6 +226,30 @@ export default function NewIncidentPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="incident-type">Incident Type (Article 73) *</Label>
+                  <Select
+                    value={incidentType}
+                    onValueChange={(val) => val && setIncidentType(val)}
+                    required
+                  >
+                    <SelectTrigger id="incident-type">
+                      <SelectValue placeholder="Select incident type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="critical_infrastructure">
+                        Critical infrastructure disruption (2-day deadline)
+                      </SelectItem>
+                      <SelectItem value="death_involvement">
+                        Death or serious health harm (10-day deadline)
+                      </SelectItem>
+                      <SelectItem value="other_serious">
+                        Other serious incident (15-day deadline)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="incident-date">Date & Time of Incident *</Label>
                   <Input
                     id="incident-date"
@@ -232,12 +264,12 @@ export default function NewIncidentPage() {
               {incidentDate && (
                 <div className="bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
                   <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                    24-hour reporting deadline:{" "}
+                    {deadlineDays}-day reporting deadline:{" "}
                     {deadlineDate.toLocaleString()}
                   </p>
                   <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                    Per Article 72, serious incidents must be reported within 24
-                    hours.
+                    Per Article 73, this incident type must be reported within{" "}
+                    {deadlineDays} days.
                   </p>
                 </div>
               )}

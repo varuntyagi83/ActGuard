@@ -97,6 +97,7 @@ interface FormData {
   deploymentMemberStates: string[];
   integrationDescription: string;
   humanOversightLevel: string;
+  euDatabaseId: string;
 }
 
 export default function NewSystemPage() {
@@ -116,6 +117,7 @@ export default function NewSystemPage() {
     deploymentMemberStates: [],
     integrationDescription: "",
     humanOversightLevel: "",
+    euDatabaseId: "",
   });
 
   function toggleArrayItem(field: "dataTypesProcessed" | "affectedPopulations" | "deploymentMemberStates", item: string) {
@@ -265,6 +267,20 @@ export default function NewSystemPage() {
                   setForm({ ...form, intendedUse: e.target.value })
                 }
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="euDatabaseId">EU Database Registration ID</Label>
+              <Input
+                id="euDatabaseId"
+                placeholder="e.g. EU-AI-2026-00001"
+                value={form.euDatabaseId}
+                onChange={(e) =>
+                  setForm({ ...form, euDatabaseId: e.target.value })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional. Enter if your system is already registered in the EU AI database.
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -430,6 +446,12 @@ export default function NewSystemPage() {
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Intended use</h3>
                 <p className="text-sm">{form.intendedUse}</p>
+              </div>
+            )}
+            {form.euDatabaseId && (
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-1">EU Database Registration ID</h3>
+                <p className="text-sm">{form.euDatabaseId}</p>
               </div>
             )}
             <div>

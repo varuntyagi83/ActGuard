@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/rbac";
+import { calculateDeadline, isValidIncidentType } from "@/lib/deadlines";
 
 export async function POST(req: Request) {
   try {
@@ -12,14 +13,15 @@ export async function POST(req: Request) {
       title,
       description,
       severity,
+      incidentType,
       incidentDate,
       aiSystemId,
       memberState,
     } = body;
 
-    if (!title || !description || !severity || !incidentDate) {
+    if (!title || !description || !severity || !incidentDate || !incidentType) {
       return NextResponse.json(
-        { error: "Title, description, severity, and incident date are required" },
+        { error: "Title, description, severity, incident type, and date are required" },
         { status: 400 }
       );
     }
@@ -31,9 +33,16 @@ export async function POST(req: Request) {
       );
     }
 
-    // 24-hour reporting deadline per Article 72
+    if (!isValidIncidentType(incidentType)) {
+      return NextResponse.json(
+        { error: "Incident type must be critical_infrastructure, death_involvement, or other_serious" },
+        { status: 400 }
+      );
+    }
+
+    // Variable deadline per Article 73: 2 days (infrastructure), 10 days (death), 15 days (other)
     const incidentDateObj = new Date(incidentDate);
-    const reportingDeadline = new Date(incidentDateObj.getTime() + 24 * 60 * 60 * 1000);
+    const reportingDeadline = calculateDeadline(incidentDateObj, incidentType);
 
     // Auto-resolve authority from national_authorities table
     let authorityName: string | null = null;
@@ -55,6 +64,7 @@ export async function POST(req: Request) {
         title,
         description,
         severity,
+        incidentType,
         incidentDate: incidentDateObj,
         reportingDeadline,
         status: "draft",

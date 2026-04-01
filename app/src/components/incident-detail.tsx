@@ -10,6 +10,7 @@ import {
   Mail,
   MessageSquare,
 } from "lucide-react";
+import { IncidentReportPanel } from "@/components/incident-report-panel";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -219,6 +220,13 @@ export function IncidentDetail({
             </div>
           </CardContent>
         </Card>
+
+        {/* Authority Reports */}
+        <IncidentReportPanel
+          incidentId={incident.id}
+          authorityName={incident.authorityName}
+          authorityContact={incident.authorityContact}
+        />
 
         {/* Root cause & resolution */}
         <Card>
