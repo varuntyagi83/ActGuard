@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── NextAuth.js tables ───────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Application tables ───────────────────────────────────────
+
+model Organization {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  subscriptionTier String   @default("free") @map("subscription_tier")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  users     User[]
+  aiSystems AiSystem[]
+  incidents Incident[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String  @id @default(cuid())
+  name           String?
+  email          String  @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String? @map("hashed_password")
+  orgId          String? @map("org_id")
+  role           String  @default("viewer")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  organization        Organization?        @relation(fields: [orgId], references: [id])
+  accounts            Account[]
+  sessions            Session[]
+  complianceDocuments ComplianceDocument[]
+  incidents           Incident[]
+  timelineEntries     IncidentTimeline[]
+
+  @@map("users")
+}
+
+model AiSystem {
+  id                      String   @id @default(cuid())
+  orgId                   String   @map("org_id")
+  name                    String
+  description             String   @db.Text
+  purpose                 String?  @db.Text
+  intendedUse             String?  @map("intended_use") @db.Text
+  riskTier                String   @default("unclassified") @map("risk_tier")
+  classificationReasoning String?  @map("classification_reasoning") @db.Text
+  dataTypesProcessed      String[] @map("data_types_processed")
+  affectedPopulations     String[] @map("affected_populations")
+  deploymentMemberStates  String[] @map("deployment_member_states")
+  humanOversightLevel     String?  @map("human_oversight_level")
+  scaleOfDeployment       String?  @map("scale_of_deployment")
+  integrationDescription  String?  @map("integration_description") @db.Text
+  status                  String   @default("draft")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  organization        Organization         @relation(fields: [orgId], references: [id])
+  complianceDocuments ComplianceDocument[]
+  incidents           Incident[]
+  checklists          ComplianceChecklist[]
+
+  @@index([orgId, status])
+  @@map("ai_systems")
+}
+
+model ComplianceDocument {
+  id          String   @id @default(cuid())
+  aiSystemId  String   @map("ai_system_id")
+  docType     String   @map("doc_type")
+  content     Json
+  version     Int      @default(1)
+  generatedAt DateTime @default(now()) @map("generated_at")
+  generatedBy String?  @map("generated_by")
+
+  aiSystem  AiSystem @relation(fields: [aiSystemId], references: [id], onDelete: Cascade)
+  generator User?    @relation(fields: [generatedBy], references: [id])
+
+  @@index([aiSystemId, docType])
+  @@map("compliance_documents")
+}
+
+model Incident {
+  id                String   @id @default(cuid())
+  orgId             String   @map("org_id")
+  aiSystemId        String?  @map("ai_system_id")
+  title             String
+  description       String   @db.Text
+  severity          String
+  incidentDate      DateTime @map("incident_date")
+  reportedAt        DateTime? @map("reported_at")
+  reportingDeadline DateTime @map("reporting_deadline")
+  status            String   @default("draft")
+  memberState       String?  @map("member_state") @db.VarChar(2)
+  authorityName     String?  @map("authority_name")
+  authorityContact  String?  @map("authority_contact")
+  rootCause         String?  @map("root_cause") @db.Text
+  remediationSteps  String[] @map("remediation_steps")
+  resolutionNotes   String?  @map("resolution_notes") @db.Text
+  createdBy         String?  @map("created_by")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  organization Organization  @relation(fields: [orgId], references: [id])
+  aiSystem     AiSystem?     @relation(fields: [aiSystemId], references: [id])
+  creator      User?         @relation(fields: [createdBy], references: [id])
+  timeline     IncidentTimeline[]
+
+  @@index([orgId, status, reportingDeadline])
+  @@map("incidents")
+}
+
+model IncidentTimeline {
+  id          String   @id @default(cuid())
+  incidentId  String   @map("incident_id")
+  eventType   String   @map("event_type")
+  description String   @db.Text
+  createdBy   String?  @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  creator  User?    @relation(fields: [createdBy], references: [id])
+
+  @@map("incident_timeline")
+}
+
+model ComplianceChecklist {
+  id                   String    @id @default(cuid())
+  aiSystemId           String    @map("ai_system_id")
+  checklistType        String    @map("checklist_type")
+  items                Json
+  completionPercentage Float     @default(0) @map("completion_percentage")
+  lastReviewed         DateTime? @map("last_reviewed")
+
+  aiSystem AiSystem @relation(fields: [aiSystemId], references: [id], onDelete: Cascade)
+
+  @@map("compliance_checklists")
+}
+
+model RagDocument {
+  id         String  @id @default(cuid())
+  source     String
+  articleRef String? @map("article_ref")
+  content    String  @db.Text
+  metadata   Json?
+
+  @@map("rag_documents")
+}
+
+model NationalAuthority {
+  id            String  @id @default(cuid())
+  countryCode   String  @map("country_code") @db.VarChar(2)
+  countryName   String  @map("country_name")
+  authorityName String  @map("authority_name")
+  contactEmail  String? @map("contact_email")
+  submissionUrl String? @map("submission_url")
+  phone         String?
+  notes         String? @db.Text
+
+  @@map("national_authorities")
+}
