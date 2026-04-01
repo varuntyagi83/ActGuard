@@ -12,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IncidentAnalytics } from "@/components/incident-analytics";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-100 text-red-800",
@@ -28,6 +30,35 @@ export default async function IncidentsPage() {
     include: { aiSystem: { select: { name: true } } },
     orderBy: { reportingDeadline: "asc" },
   });
+
+  // Analytics data
+  const now = new Date();
+  const severityCounts = incidents.reduce((acc, i) => {
+    acc[i.severity] = (acc[i.severity] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const statusCounts = incidents.reduce((acc, i) => {
+    acc[i.status] = (acc[i.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const reportedIncidents = incidents.filter((i) => i.reportedAt);
+  const avgResponseHours =
+    reportedIncidents.length > 0
+      ? reportedIncidents.reduce((sum, i) => {
+          const responseTime =
+            (new Date(i.reportedAt!).getTime() - new Date(i.incidentDate).getTime()) /
+            (1000 * 60 * 60);
+          return sum + responseTime;
+        }, 0) / reportedIncidents.length
+      : null;
+
+  const overdueCount = incidents.filter(
+    (i) =>
+      !["resolved", "closed"].includes(i.status) &&
+      new Date(i.reportingDeadline) < now
+  ).length;
 
   return (
     <div>
@@ -46,6 +77,23 @@ export default async function IncidentsPage() {
         </Link>
       </div>
 
+      <Tabs defaultValue="list" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="list">Incidents ({incidents.length})</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analytics">
+          <IncidentAnalytics
+            severityCounts={severityCounts}
+            statusCounts={statusCounts}
+            avgResponseHours={avgResponseHours}
+            overdueCount={overdueCount}
+            totalCount={incidents.length}
+          />
+        </TabsContent>
+
+        <TabsContent value="list">
       {incidents.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-gray-950 rounded-xl border">
           <AlertTriangle className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -127,6 +175,8 @@ export default async function IncidentsPage() {
           </Table>
         </div>
       )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

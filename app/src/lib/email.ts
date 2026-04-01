@@ -31,6 +31,43 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   });
 }
 
+export async function sendDeadlineAlertEmail(
+  email: string,
+  incidentTitle: string,
+  hoursLeft: number,
+  deadlineDate: string,
+  incidentId: string
+) {
+  const incidentUrl = `${APP_URL}/incidents/${incidentId}`;
+  const urgency = hoursLeft <= 0 ? "OVERDUE" : hoursLeft <= 6 ? "URGENT" : "Approaching";
+  const urgencyColor = hoursLeft <= 0 ? "#dc2626" : hoursLeft <= 6 ? "#ea580c" : "#ca8a04";
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: email,
+    subject: `[${urgency}] Incident Deadline: ${incidentTitle}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:500px;margin:0 auto;padding:24px;">
+        <div style="background:${urgencyColor};color:#fff;padding:12px 16px;border-radius:6px 6px 0 0;font-weight:bold;font-size:14px;">
+          ${urgency}: Reporting Deadline ${hoursLeft <= 0 ? "Passed" : "Approaching"}
+        </div>
+        <div style="border:1px solid #ddd;border-top:none;border-radius:0 0 6px 6px;padding:16px;">
+          <h3 style="margin:0 0 8px;font-size:16px;">${incidentTitle}</h3>
+          <p style="color:#555;font-size:13px;margin:0 0 12px;">
+            Deadline: <strong>${deadlineDate}</strong><br/>
+            ${hoursLeft > 0 ? `Time remaining: <strong>${Math.floor(hoursLeft)}h ${Math.floor((hoursLeft % 1) * 60)}m</strong>` : `<strong style="color:#dc2626;">This deadline has passed.</strong>`}
+          </p>
+          <a href="${incidentUrl}" style="display:inline-block;background:#2563eb;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:500;font-size:13px;">
+            View Incident
+          </a>
+        </div>
+        <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
+        <p style="color:#aaa;font-size:11px;">ActGuard — EU AI Act Compliance Suite</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${APP_URL}/verify-email?token=${token}`;
 
