@@ -11,9 +11,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import { ClassificationPanel } from "@/components/classification-panel";
+import { SystemDetailWithRag } from "@/components/system-detail-with-rag";
 
 const riskColors: Record<string, string> = {
   unacceptable: "bg-red-500 text-white",
@@ -46,8 +46,20 @@ export default async function SystemDetailPage({
     ? JSON.parse(system.classificationReasoning)
     : null;
 
+  // Build auto-query from system context
+  const ragAutoQuery = [
+    system.riskTier !== "unclassified" ? `${system.riskTier} risk AI systems` : "",
+    system.dataTypesProcessed.includes("Biometric") ? "biometric data" : "",
+    system.dataTypesProcessed.includes("Health") ? "health data AI" : "",
+    system.affectedPopulations.includes("Job applicants") ? "employment AI systems" : "",
+    system.affectedPopulations.includes("Students") ? "education AI systems" : "",
+    "EU AI Act compliance requirements",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div>
+    <SystemDetailWithRag autoQuery={ragAutoQuery}>
       <Link href="/systems">
         <Button variant="ghost" className="gap-2 mb-4">
           <ArrowLeft className="h-4 w-4" />
@@ -206,6 +218,6 @@ export default async function SystemDetailPage({
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </SystemDetailWithRag>
   );
 }
