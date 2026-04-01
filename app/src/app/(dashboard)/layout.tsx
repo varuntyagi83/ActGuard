@@ -26,7 +26,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex h-screen">
       <Sidebar user={session.user} orgName={org?.name || "My Organisation"} />
-      <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+      <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
         {children}
       </main>
     </div>

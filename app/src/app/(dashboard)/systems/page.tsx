@@ -59,7 +59,7 @@ export default async function SystemsPage() {
       </div>
 
       {systems.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl border">
+        <div className="text-center py-20 bg-white dark:bg-gray-950 rounded-xl border">
           <Cpu className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No AI systems yet
@@ -76,7 +76,7 @@ export default async function SystemsPage() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border">
+        <div className="bg-white dark:bg-gray-950 rounded-xl border">
           <Table>
             <TableHeader>
               <TableRow>

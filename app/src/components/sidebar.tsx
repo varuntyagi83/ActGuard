@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -37,7 +38,7 @@ export function Sidebar({ user, orgName }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col w-64 bg-white border-r h-full">
+    <div className="flex flex-col w-64 bg-white dark:bg-gray-950 border-r h-full">
       {/* Logo + Org */}
       <div className="px-6 py-5">
         <div className="flex items-center gap-2">
@@ -62,8 +63,8 @@ export function Sidebar({ user, orgName }: SidebarProps) {
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  ? "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-400"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -75,10 +76,10 @@ export function Sidebar({ user, orgName }: SidebarProps) {
 
       <Separator />
 
-      {/* User */}
+      {/* User + Theme */}
       <div className="px-4 py-4">
         <div className="flex items-center gap-3 mb-3">
-          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-700">
+          <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-sm font-medium text-blue-700 dark:text-blue-300">
             {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "?"}
           </div>
           <div className="flex-1 min-w-0">
@@ -86,10 +87,11 @@ export function Sidebar({ user, orgName }: SidebarProps) {
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
         </div>
+        <ThemeToggle />
         <Button
           variant="ghost"
           size="sm"
-          className="w-full justify-start gap-2 text-gray-600"
+          className="w-full justify-start gap-2 text-gray-600 dark:text-gray-400"
           onClick={() => signOut({ callbackUrl: "/" })}
         >
           <LogOut className="h-4 w-4" />

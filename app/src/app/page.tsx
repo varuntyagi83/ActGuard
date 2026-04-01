@@ -6,7 +6,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Nav */}
-      <header className="border-b bg-white">
+      <header className="border-b bg-white dark:bg-gray-950">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Shield className="h-7 w-7 text-blue-600" />
@@ -30,12 +30,12 @@ export default function LandingPage() {
             <Clock className="h-4 w-4" />
             EU AI Act high-risk enforcement: August 2, 2026
           </div>
-          <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-6xl">
             Compliance before the
             <br />
             <span className="text-blue-600">clock runs out.</span>
           </h1>
-          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Classify your AI systems, generate audit-ready documentation, and
             manage incident reporting — all in one platform built for the EU AI
             Act.
@@ -55,25 +55,25 @@ export default function LandingPage() {
         </section>
 
         {/* Features */}
-        <section className="bg-gray-50 border-t">
+        <section className="bg-gray-50 dark:bg-gray-900 border-t">
           <div className="max-w-6xl mx-auto px-6 py-20">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
               Two modules. Full compliance coverage.
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-xl border p-8">
+              <div className="bg-white dark:bg-gray-950 rounded-xl border p-8">
                 <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
                   <FileText className="h-6 w-6 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   Compliance-as-a-Service
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   Risk classification powered by AI. Technical documentation,
                   risk management plans, and data governance records generated in
                   minutes — not weeks.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
                     Article 6 + Annex III risk classification
@@ -89,19 +89,19 @@ export default function LandingPage() {
                 </ul>
               </div>
 
-              <div className="bg-white rounded-xl border p-8">
+              <div className="bg-white dark:bg-gray-950 rounded-xl border p-8">
                 <div className="h-12 w-12 rounded-lg bg-orange-100 flex items-center justify-center mb-4">
                   <AlertTriangle className="h-6 w-6 text-orange-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">
                   AI Incident Reporting
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
                   24-hour SLA tracking, severity classification, and automatic
                   authority routing across all 27 EU member states. Never miss a
                   reporting deadline.
                 </p>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-orange-600" />
                     Article 72 incident reporting
@@ -122,10 +122,10 @@ export default function LandingPage() {
 
         {/* Pricing teaser */}
         <section className="max-w-6xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             From EUR 0 to enterprise
           </h2>
-          <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-lg mx-auto">
             Free tier to get started. Pro at EUR 99/mo for growing teams.
             Enterprise at EUR 499/mo for full compliance coverage.
           </p>
@@ -138,8 +138,8 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between text-sm text-gray-500">
+      <footer className="border-t bg-white dark:bg-gray-950">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             ActGuard

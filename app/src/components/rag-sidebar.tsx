@@ -66,7 +66,7 @@ export function RagSidebar({ autoQuery }: RagSidebarProps) {
   }
 
   return (
-    <div className="w-80 border-l bg-white h-full flex flex-col">
+    <div className="w-80 border-l bg-white dark:bg-gray-950 h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b">
         <div className="flex items-center gap-2 mb-3">
