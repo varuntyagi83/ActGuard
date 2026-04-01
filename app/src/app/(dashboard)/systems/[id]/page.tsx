@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -177,44 +177,21 @@ export default async function SystemDetailPage({
 
         {/* Documents Tab */}
         <TabsContent value="documents">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Compliance Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {system.complianceDocuments.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-2">
-                    No documents generated yet.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {system.status === "classified"
-                      ? "Document generation will be available in Phase 2."
-                      : "Classify this system first to begin generating compliance documents."}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {system.complianceDocuments.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="flex items-center justify-between border rounded-lg p-4"
-                    >
-                      <div>
-                        <p className="font-medium capitalize">
-                          {doc.docType.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          Version {doc.version} — {doc.generatedAt.toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Badge variant="secondary">v{doc.version}</Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">
+              {system.complianceDocuments.length} document{system.complianceDocuments.length !== 1 ? "s" : ""} generated
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Generate Article 11, Article 9, and Article 10 compliance documents.
+            </p>
+            <Link href={`/systems/${system.id}/documents`}>
+              <Button className="gap-2">
+                <FileText className="h-4 w-4" />
+                Manage documents
+              </Button>
+            </Link>
+          </div>
         </TabsContent>
       </Tabs>
     </SystemDetailWithRag>
