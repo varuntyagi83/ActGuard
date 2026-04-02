@@ -7,9 +7,12 @@ export default async function NewSystemPage() {
   const session = await auth();
   const orgId = session!.user.orgId!;
 
-  const count = await db.aiSystem.count({ where: { orgId } });
-  if (count >= 1) {
-    redirect("/systems");
+  const UNLIMITED_EMAILS = ["varun.tyagi83@gmail.com"];
+  if (!UNLIMITED_EMAILS.includes(session!.user.email!)) {
+    const count = await db.aiSystem.count({ where: { orgId } });
+    if (count >= 1) {
+      redirect("/systems");
+    }
   }
 
   return <NewSystemForm />;

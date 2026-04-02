@@ -51,7 +51,7 @@ export default async function SystemsPage() {
             Register and manage your AI systems for EU AI Act compliance.
           </p>
         </div>
-        {systems.length === 0 && (
+        {(systems.length === 0 || session!.user.email === "varun.tyagi83@gmail.com") && (
           <Link href="/systems/new">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
