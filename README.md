@@ -46,7 +46,7 @@ ActGuard is a full-stack compliance platform that helps companies deploying AI i
 | Embeddings | OpenAI text-embedding-3-small (1536d) stored in pgvector |
 | PDF | @react-pdf/renderer |
 | Email | Resend |
-| Deploy | Vercel (app) + Railway (PostgreSQL) |
+| Deploy | Railway (app + PostgreSQL) |
 
 ---
 
@@ -121,12 +121,18 @@ npx tsx scripts/ingest-eu-ai-act.ts  # Re-ingest EU AI Act into RAG
 
 ---
 
-## Deployment (Vercel + Railway)
+## Deployment (Railway)
 
-1. **Database** — Create a PostgreSQL service on Railway. Enable the `vector` extension and run `npx prisma migrate deploy` with the Railway connection URL.
-2. **App** — Deploy the `app/` directory to Vercel. Set the root directory to `app` in Vercel project settings.
-3. **Environment variables** — Add all variables from `.env` to both Vercel and Railway. Use Railway's internal URL (`DATABASE_INTERNAL_URL`) for the deployed app.
-4. **Cron** — `vercel.json` configures an hourly cron at `/api/incidents/check-deadlines` for SLA alerts (Vercel Pro required).
+Both the Next.js app and PostgreSQL database are hosted on Railway.
+
+1. **Database** — Create a PostgreSQL service on Railway. Run migrations with the public connection URL:
+   ```bash
+   DATABASE_URL="postgresql://..." npx prisma migrate deploy
+   ```
+2. **App** — Create a new Railway service from the GitHub repo. Set the root directory to `app` in the service settings.
+3. **Environment variables** — Add all variables from `.env` to the Railway service. Use Railway's internal PostgreSQL URL (`DATABASE_INTERNAL_URL`) as `DATABASE_URL` in the deployed service for lower latency.
+4. **Start command** — Railway will auto-detect Next.js. Ensure the build command is `npm run build` and start command is `npm start`.
+5. **Cron** — The hourly SLA deadline check (`/api/incidents/check-deadlines`) is configured in `vercel.json` but must be triggered separately on Railway (e.g. via a Railway cron service or an external cron like cron-job.org).
 
 ---
 
