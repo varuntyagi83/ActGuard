@@ -67,16 +67,21 @@ export async function getContextForPrompt(
   query: string,
   topK: number = 3
 ): Promise<string> {
-  const results = await searchArticles(query, topK);
+  try {
+    const results = await searchArticles(query, topK);
 
-  if (results.length === 0) {
+    if (results.length === 0) {
+      return "No relevant EU AI Act articles found.";
+    }
+
+    return results
+      .map(
+        (r) =>
+          `--- ${r.articleRef}: ${r.metadata.title} (similarity: ${(r.similarity * 100).toFixed(0)}%) ---\n${r.content}`
+      )
+      .join("\n\n");
+  } catch (err) {
+    console.error("RAG search failed, proceeding without context:", err);
     return "No relevant EU AI Act articles found.";
   }
-
-  return results
-    .map(
-      (r) =>
-        `--- ${r.articleRef}: ${r.metadata.title} (similarity: ${(r.similarity * 100).toFixed(0)}%) ---\n${r.content}`
-    )
-    .join("\n\n");
 }
