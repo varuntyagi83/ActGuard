@@ -1,20 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import NextAuth from "next-auth";
+import { NextResponse } from "next/server";
+import { authConfig } from "@/lib/auth.config";
+
+const { auth } = NextAuth(authConfig);
 
 const publicRoutes = ["/", "/sign-in", "/sign-up", "/forgot-password", "/reset-password", "/verify-email"];
 const authRoutes = ["/sign-in", "/sign-up"];
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl;
+  const session = req.auth;
+  const isLoggedIn = !!session?.user;
+  const hasOrg = !!session?.user?.orgId;
 
-  const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
-  const token = await getToken({ req, secret });
-  const isLoggedIn = !!token;
-  const hasOrg = !!token?.orgId;
-
-  // Allow public routes for unauthenticated users
   if (publicRoutes.includes(pathname)) {
-    // Redirect logged-in users away from auth pages
     if (isLoggedIn && authRoutes.includes(pathname)) {
       return NextResponse.redirect(
         new URL(hasOrg ? "/dashboard" : "/onboarding", req.nextUrl)
@@ -23,26 +22,21 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Unauthenticated users → sign-in
   if (!isLoggedIn) {
     return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
   }
 
-  // Authenticated but no org → onboarding (except onboarding itself)
   if (!hasOrg && pathname !== "/onboarding") {
     return NextResponse.redirect(new URL("/onboarding", req.nextUrl));
   }
 
-  // Onboarding page when user already has org → dashboard
   if (hasOrg && pathname === "/onboarding") {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };
