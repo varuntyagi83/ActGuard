@@ -15,6 +15,7 @@ import Link from "next/link";
 import { ClassificationPanel } from "@/components/classification-panel";
 import { SystemDetailWithRag } from "@/components/system-detail-with-rag";
 import { ComplianceChecklist } from "@/components/compliance-checklist";
+import { EuDatabaseIdEditor } from "@/components/eu-database-id-editor";
 
 const riskColors: Record<string, string> = {
   unacceptable: "bg-red-500 text-white",
@@ -108,6 +109,10 @@ export default async function SystemDetailPage({
                 <CardTitle className="text-base">Basic Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-1">EU Database ID</p>
+                  <EuDatabaseIdEditor systemId={system.id} currentValue={system.euDatabaseId} />
+                </div>
                 {system.purpose && (
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Purpose</p>

@@ -40,9 +40,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Variable deadline per Article 73: 2 days (infrastructure), 10 days (death), 15 days (other)
+    // Variable deadline per Article 73: clock starts when provider becomes aware (now), not incident date
     const incidentDateObj = new Date(incidentDate);
-    const reportingDeadline = calculateDeadline(incidentDateObj, incidentType);
+    const awareAt = new Date();
+    const reportingDeadline = calculateDeadline(awareAt, incidentType);
 
     // Auto-resolve authority from national_authorities table
     let authorityName: string | null = null;

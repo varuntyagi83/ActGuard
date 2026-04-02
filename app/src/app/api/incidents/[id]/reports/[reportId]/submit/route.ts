@@ -50,12 +50,13 @@ export async function POST(
     // Generate PDF
     const pdfBuffer = await renderIncidentReportPdf(report.content as unknown as IncidentReportData);
 
-    // Send email to authority
+    // Send email to authority — reply-to is the submitting user's email
     await sendIncidentReportEmail(
       incident.authorityContact,
       incident.title,
       report.reportType,
-      Buffer.from(pdfBuffer)
+      Buffer.from(pdfBuffer),
+      session!.user.email || undefined
     );
 
     // Update report as submitted

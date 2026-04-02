@@ -18,6 +18,7 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   conformity_assessment: "Conformity Assessment",
   transparency_info: "Transparency Information",
   human_oversight_plan: "Human Oversight Plan",
+  declaration_of_conformity: "EU Declaration of Conformity",
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -70,6 +71,14 @@ const SECTION_LABELS: Record<string, string> = {
   decision_review_and_appeal_process: "6. Decision Review and Appeal Process",
   monitoring_and_escalation_protocols: "7. Monitoring and Escalation Protocols",
   oversight_effectiveness_evaluation: "8. Oversight Effectiveness Evaluation",
+  // Declaration of Conformity (Article 47)
+  provider_identification: "1. Provider Identification",
+  system_identification: "2. AI System Identification",
+  declaration_statement: "3. Declaration Statement",
+  harmonised_standards_applied: "4. Harmonised Standards Applied",
+  notified_body_involvement: "5. Notified Body Involvement",
+  relevant_eu_ai_act_requirements: "6. Relevant EU AI Act Requirements",
+  place_date_and_signature: "7. Place, Date and Signature",
 };
 
 const styles = StyleSheet.create({
@@ -171,6 +180,98 @@ function renderSectionContent(key: string, value: unknown): React.JSX.Element {
   return React.createElement(Text, { style: styles.sectionContent }, flattenValue(parsed));
 }
 
+const declarationStyles = StyleSheet.create({
+  page: { padding: 60, fontFamily: "Helvetica", fontSize: 11, color: "#1a1a1a" },
+  euBadge: { alignSelf: "center", borderWidth: 2, borderColor: "#003399", borderRadius: 4, paddingHorizontal: 14, paddingVertical: 6, marginBottom: 20 },
+  euBadgeText: { fontSize: 10, fontWeight: "bold", color: "#003399", textTransform: "uppercase", letterSpacing: 1 },
+  declarationTitle: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 4 },
+  declarationSubtitle: { fontSize: 11, textAlign: "center", color: "#555", marginBottom: 6 },
+  articleRef: { fontSize: 9, textAlign: "center", color: "#2563eb", marginBottom: 24 },
+  divider: { borderBottomWidth: 1, borderBottomColor: "#003399", marginBottom: 20 },
+  fieldBlock: { marginBottom: 14 },
+  fieldLabel: { fontSize: 8, fontWeight: "bold", color: "#555", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 3 },
+  fieldValue: { fontSize: 10, color: "#1a1a1a", lineHeight: 1.5 },
+  sectionHeading: { fontSize: 11, fontWeight: "bold", marginTop: 16, marginBottom: 6, color: "#003399" },
+  bodyText: { fontSize: 10, lineHeight: 1.6, color: "#333" },
+  signatureBox: { borderWidth: 1, borderColor: "#ccc", borderRadius: 4, padding: 14, marginTop: 24 },
+  signatureLabel: { fontSize: 8, color: "#888", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 },
+  signatureLine: { borderBottomWidth: 1, borderBottomColor: "#555", marginTop: 28, marginBottom: 4 },
+  signatureHint: { fontSize: 8, color: "#999" },
+  footer: { position: "absolute", bottom: 30, left: 60, right: 60, borderTopWidth: 1, borderTopColor: "#ddd", paddingTop: 8, textAlign: "center", fontSize: 8, color: "#999" },
+});
+
+function buildDeclarationPdf(
+  content: Record<string, unknown>,
+  systemName: string,
+  version: number,
+  generatedAt: Date
+): React.ReactElement<import("@react-pdf/renderer").DocumentProps> {
+  function field(label: string, key: string): React.ReactElement {
+    return React.createElement(View, { style: declarationStyles.fieldBlock },
+      React.createElement(Text, { style: declarationStyles.fieldLabel }, label),
+      React.createElement(Text, { style: declarationStyles.fieldValue }, flattenValue(content[key] ?? ""))
+    );
+  }
+
+  function section(heading: string, key: string): React.ReactElement {
+    return React.createElement(View, { key },
+      React.createElement(Text, { style: declarationStyles.sectionHeading }, heading),
+      React.createElement(Text, { style: declarationStyles.bodyText }, flattenValue(content[key] ?? ""))
+    );
+  }
+
+  return React.createElement(Document, null,
+    React.createElement(Page, { size: "A4", style: declarationStyles.page },
+
+      // EU badge
+      React.createElement(View, { style: declarationStyles.euBadge },
+        React.createElement(Text, { style: declarationStyles.euBadgeText }, "European Union — EU AI Act")
+      ),
+
+      // Title block
+      React.createElement(Text, { style: declarationStyles.declarationTitle }, "EU Declaration of Conformity"),
+      React.createElement(Text, { style: declarationStyles.declarationSubtitle },
+        `${systemName} — Version ${version} — ${generatedAt.toLocaleDateString()}`
+      ),
+      React.createElement(Text, { style: declarationStyles.articleRef },
+        "Issued pursuant to Article 47 of Regulation (EU) 2024/1689 (EU AI Act)"
+      ),
+      React.createElement(View, { style: declarationStyles.divider }),
+
+      // Provider & system identification
+      field("Provider (name and address)", "provider_identification"),
+      field("AI system name, version and purpose", "system_identification"),
+
+      // Declaration statement
+      section("Declaration Statement", "declaration_statement"),
+
+      // Harmonised standards
+      section("Harmonised Standards Applied", "harmonised_standards_applied"),
+
+      // Notified body
+      section("Notified Body Involvement", "notified_body_involvement"),
+
+      // EU AI Act requirements
+      section("Relevant EU AI Act Requirements", "relevant_eu_ai_act_requirements"),
+
+      // Signature block
+      React.createElement(View, { style: declarationStyles.signatureBox },
+        React.createElement(Text, { style: declarationStyles.signatureLabel }, "Place, Date and Authorised Signature"),
+        React.createElement(Text, { style: declarationStyles.bodyText }, flattenValue(content["place_date_and_signature"] ?? "")),
+        React.createElement(View, { style: declarationStyles.signatureLine }),
+        React.createElement(Text, { style: declarationStyles.signatureHint },
+          "Authorised representative signature — name and position of signatory"
+        )
+      ),
+
+      // Footer
+      React.createElement(View, { style: declarationStyles.footer, fixed: true },
+        React.createElement(Text, null, "Generated by ActGuard — EU AI Act Compliance Suite")
+      )
+    )
+  );
+}
+
 export async function GET(req: Request) {
   try {
     const { session, error } = await requireRole("viewer");
@@ -201,6 +302,18 @@ export async function GET(req: Request) {
 
     const docTypeLabel = DOC_TYPE_LABELS[doc.docType] || doc.docType;
     const systemName = doc.aiSystem.name;
+
+    // Declaration of Conformity gets its own legal-document layout
+    if (doc.docType === "declaration_of_conformity") {
+      const pdfDoc = buildDeclarationPdf(content, systemName, doc.version, doc.generatedAt);
+      const buffer = await renderToBuffer(pdfDoc);
+      return new NextResponse(new Uint8Array(buffer), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="declaration-of-conformity-v${doc.version}.pdf"`,
+        },
+      });
+    }
 
     const pdfDoc = React.createElement(Document, null,
       React.createElement(Page, { size: "A4", style: styles.page },

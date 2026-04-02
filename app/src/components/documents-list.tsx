@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FileText, Plus, Loader2, Check, History, ChevronDown } from "lucide-react";
+import { formatDate } from "@/lib/format-date";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -171,7 +172,7 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
                 <div className="flex items-center gap-2">
                   <p className="text-xs text-muted-foreground">
                     Version {latest.version} — Generated{" "}
-                    {new Date(latest.generatedAt).toLocaleDateString()}
+                    {formatDate(latest.generatedAt)}
                   </p>
                   {olderVersions.length > 0 && (
                     <button
@@ -198,7 +199,7 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
                       >
                         <p className="text-xs text-muted-foreground">
                           v{doc.version} — Generated{" "}
-                          {new Date(doc.generatedAt).toLocaleDateString()}
+                          {formatDate(doc.generatedAt)}
                         </p>
                         <Link
                           href={`/systems/${systemId}/documents/${doc.id}`}

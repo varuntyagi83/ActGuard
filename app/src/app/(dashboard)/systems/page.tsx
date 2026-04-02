@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate } from "@/lib/format-date";
 
 const riskColors: Record<string, string> = {
   unacceptable: "bg-red-100 text-red-800",
@@ -116,7 +117,7 @@ export default async function SystemsPage() {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
-                      {system.updatedAt.toLocaleDateString()}
+                      {formatDate(system.updatedAt)}
                     </span>
                   </TableCell>
                 </TableRow>

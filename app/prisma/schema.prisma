@@ -51,6 +51,9 @@ model Organization {
   name             String
   slug             String   @unique
   subscriptionTier String   @default("free") @map("subscription_tier")
+  alertAt72h       Boolean  @default(true) @map("alert_at_72h")
+  alertAt24h       Boolean  @default(true) @map("alert_at_24h")
+  alertOnOverdue   Boolean  @default(true) @map("alert_on_overdue")
   createdAt        DateTime @default(now()) @map("created_at")
 
   users     User[]
@@ -146,6 +149,9 @@ model Incident {
   rootCause         String?  @map("root_cause") @db.Text
   remediationSteps  String[] @map("remediation_steps")
   resolutionNotes   String?  @map("resolution_notes") @db.Text
+  alert72hSentAt    DateTime? @map("alert_72h_sent_at")
+  alert24hSentAt    DateTime? @map("alert_24h_sent_at")
+  alertOverdueSentAt DateTime? @map("alert_overdue_sent_at")
   createdBy         String?  @map("created_by")
   createdAt         DateTime @default(now()) @map("created_at")
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { IncidentDetail } from "@/components/incident-detail";
+import { formatDate, formatDateTime } from "@/lib/format-date";
 
 const severityColors: Record<string, string> = {
   critical: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
@@ -39,6 +40,7 @@ export default async function IncidentDetailPage({
         orderBy: { createdAt: "desc" },
       },
       creator: { select: { name: true, email: true } },
+      reports: { select: { reportType: true, submittedAt: true } },
     },
   });
 
@@ -73,7 +75,7 @@ export default async function IncidentDetailPage({
           <p className="text-muted-foreground mt-1">
             {incident.aiSystem?.name || "No linked system"} —{" "}
             Reported by {incident.creator?.name || incident.creator?.email || "Unknown"} on{" "}
-            {incident.createdAt.toLocaleDateString()}
+            {formatDate(incident.createdAt)}
           </p>
         </div>
         <div
@@ -96,10 +98,12 @@ export default async function IncidentDetailPage({
           >
             {isOverdue
               ? "OVERDUE"
-              : `${Math.floor(hoursLeft)}h ${Math.floor((hoursLeft % 1) * 60)}m`}
+              : hoursLeft >= 48
+                ? `${Math.floor(hoursLeft / 24)}d ${Math.floor(hoursLeft % 24)}h`
+                : `${Math.floor(hoursLeft)}h ${Math.floor((hoursLeft % 1) * 60)}m`}
           </p>
           <p className="text-xs text-muted-foreground">
-            Deadline: {deadline.toLocaleString()}
+            Deadline: {formatDateTime(deadline)}
           </p>
         </div>
       </div>
@@ -128,6 +132,10 @@ export default async function IncidentDetailPage({
           description: t.description,
           createdAt: t.createdAt.toISOString(),
           creatorName: t.creator?.name || t.creator?.email || "System",
+        }))}
+        reports={incident.reports.map((r) => ({
+          reportType: r.reportType,
+          submittedAt: r.submittedAt?.toISOString() || null,
         }))}
       />
     </div>

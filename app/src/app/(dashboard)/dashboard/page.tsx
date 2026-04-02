@@ -9,6 +9,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardCharts } from "@/components/dashboard-charts";
+import { formatDate } from "@/lib/format-date";
+import { OnboardingWizard } from "@/components/onboarding-wizard";
 
 const ENFORCEMENT_DATE = new Date("2026-08-02T00:00:00Z");
 
@@ -69,6 +71,9 @@ export default async function DashboardPage() {
           EU AI Act compliance overview for your organisation.
         </p>
       </div>
+
+      {/* Onboarding wizard — shown when org has no systems yet */}
+      {systems.length === 0 && <OnboardingWizard systems={systems} />}
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -166,7 +171,7 @@ export default async function DashboardPage() {
                     <div>
                       <p className="text-sm font-medium">{incident.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {incident.createdAt.toLocaleDateString()}
+                        {formatDate(incident.createdAt)}
                       </p>
                     </div>
                     <Badge

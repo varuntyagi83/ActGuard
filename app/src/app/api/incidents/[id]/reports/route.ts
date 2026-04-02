@@ -107,46 +107,31 @@ export async function POST(
       select: { name: true },
     });
 
-    // Build content JSON with 5 sections pre-populated from incident data
+    // Build content as flat IncidentReportData — matches what the PDF renderer expects
     const content = {
-      section1_provider: {
-        title: "Section 1: Provider Information",
-        organizationName: org?.name || "",
-        contactEmail: session!.user.email || "",
-        memberState: incident.memberState || "",
-      },
-      section2_system: {
-        title: "Section 2: AI System Information",
-        systemName: incident.aiSystem?.name || "",
-        systemDescription: incident.aiSystem?.description || "",
-        riskTier: incident.aiSystem?.riskTier || "",
-        euDatabaseId: incident.aiSystem?.euDatabaseId || "",
-        affectedPopulations: incident.aiSystem?.affectedPopulations || [],
-        deploymentMemberStates: incident.aiSystem?.deploymentMemberStates || [],
-      },
-      section3_incident: {
-        title: "Section 3: Incident Details",
-        incidentTitle: incident.title,
-        incidentDescription: incident.description,
-        severity: incident.severity,
-        incidentType: incident.incidentType || "",
-        incidentDate: incident.incidentDate.toISOString(),
-        reportingDeadline: incident.reportingDeadline.toISOString(),
-      },
-      section4_impact: {
-        title: "Section 4: Impact Assessment",
-        rootCause: incident.rootCause || "",
-        remediationSteps: incident.remediationSteps || [],
-        affectedIndividuals: "",
-        crossBorderImpact: "",
-      },
-      section5_measures: {
-        title: "Section 5: Corrective Measures",
-        immediateMeasures: "",
-        longTermMeasures: "",
-        resolutionNotes: incident.resolutionNotes || "",
-        preventionPlan: "",
-      },
+      reportType,
+      reportNumber,
+      reportDate: new Date().toISOString().split("T")[0],
+      authorityName: incident.authorityName || "",
+      authorityContact: incident.authorityContact || "",
+      memberState: incident.memberState || "",
+      systemName: incident.aiSystem?.name || "",
+      systemDescription: incident.aiSystem?.description || "",
+      euDatabaseId: incident.aiSystem?.euDatabaseId || "",
+      riskTier: incident.aiSystem?.riskTier || "",
+      deploymentMemberStates: incident.aiSystem?.deploymentMemberStates || [],
+      incidentTitle: incident.title,
+      incidentDate: incident.incidentDate.toISOString().split("T")[0],
+      incidentType: incident.incidentType || "",
+      severity: incident.severity,
+      description: incident.description,
+      affectedPopulations: incident.aiSystem?.affectedPopulations || [],
+      remediationSteps: incident.remediationSteps || [],
+      rootCause: incident.rootCause || "",
+      resolutionNotes: incident.resolutionNotes || "",
+      investigationStatus: incident.status,
+      submitterName: session!.user.name || session!.user.email || "",
+      organizationName: org?.name || "",
     };
 
     // Create the report

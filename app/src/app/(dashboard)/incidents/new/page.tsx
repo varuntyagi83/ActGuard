@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { formatDateTime } from "@/lib/format-date";
 
 const EU_MEMBER_STATES = [
   { code: "AT", name: "Austria" },
@@ -138,7 +139,7 @@ export default function NewIncidentPage() {
   };
   const deadlineDays = deadlineDaysMap[incidentType] || 2;
   const deadlineDate = new Date(
-    new Date(incidentDate).getTime() + deadlineDays * 24 * 60 * 60 * 1000
+    Date.now() + deadlineDays * 24 * 60 * 60 * 1000
   );
 
   return (
@@ -264,8 +265,8 @@ export default function NewIncidentPage() {
               {incidentDate && (
                 <div className="bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
                   <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                    {deadlineDays}-day reporting deadline:{" "}
-                    {deadlineDate.toLocaleString()}
+                    Reporting deadline (from now):{" "}
+                    {formatDateTime(deadlineDate)}
                   </p>
                   <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
                     Per Article 73, this incident type must be reported within{" "}

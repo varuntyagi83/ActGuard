@@ -27,6 +27,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { formatDate } from "@/lib/format-date";
 
 interface Report {
   id: string;
@@ -58,11 +67,13 @@ export function IncidentReportPanel({
   const router = useRouter();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [newReportType, setNewReportType] = useState("initial");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [confirmReport, setConfirmReport] = useState<Report | null>(null);
 
   useEffect(() => {
     fetch(`/api/incidents/${incidentId}/reports`)
@@ -73,6 +84,10 @@ export function IncidentReportPanel({
         }
       })
       .finally(() => setLoading(false));
+
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => setSessionEmail(data?.user?.email || null));
   }, [incidentId]);
 
   const hasInitial = reports.some((r) => r.reportType === "initial");
@@ -114,13 +129,6 @@ export function IncidentReportPanel({
   }
 
   async function handleSubmit(reportId: string) {
-    if (
-      !confirm(
-        `Submit this report to ${authorityName || "the authority"} (${authorityContact})? This action cannot be undone.`
-      )
-    )
-      return;
-
     setError("");
     setSuccess("");
     setSubmitting(reportId);
@@ -208,7 +216,7 @@ export function IncidentReportPanel({
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Created{" "}
-                      {new Date(report.createdAt).toLocaleDateString()}
+                      {formatDate(report.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -245,7 +253,7 @@ export function IncidentReportPanel({
                     <Button
                       size="sm"
                       className="h-7 gap-1 text-xs"
-                      onClick={() => handleSubmit(report.id)}
+                      onClick={() => setConfirmReport(report)}
                       disabled={submitting === report.id}
                     >
                       {submitting === report.id ? (
@@ -302,6 +310,77 @@ export function IncidentReportPanel({
           </p>
         )}
       </CardContent>
+
+      {/* Submission confirmation dialog */}
+      <Dialog open={!!confirmReport} onOpenChange={(open) => { if (!open) setConfirmReport(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirm Report Submission</DialogTitle>
+            <DialogDescription>
+              Review what will be sent before confirming. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          {confirmReport && (
+            <div className="space-y-4 text-sm">
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-20 shrink-0">From</span>
+                  <p>ActGuard &lt;noreply@corevisionailabs.com&gt;</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-20 shrink-0">Reply-To</span>
+                  {sessionEmail
+                    ? <p>{sessionEmail}</p>
+                    : <p className="text-muted-foreground italic">No email on account</p>
+                  }
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-20 shrink-0">To</span>
+                  <div>
+                    <p className="font-medium">{authorityName}</p>
+                    <p className="text-muted-foreground">{authorityContact}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-20 shrink-0">Subject</span>
+                  <p>[EU AI Act - Art. 73] Incident Report ({confirmReport.reportType.replace("_", " ")})</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-20 shrink-0">Attachment</span>
+                  <p className="flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                    incident-report-{confirmReport.reportNumber}-{confirmReport.reportType}.pdf
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                The PDF will be generated from the current report content and attached automatically.
+                You can preview it by clicking <strong>PDF</strong> on the report before submitting.
+              </p>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmReport(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (confirmReport) {
+                  handleSubmit(confirmReport.id);
+                  setConfirmReport(null);
+                }
+              }}
+              disabled={!!submitting}
+              className="gap-1.5"
+            >
+              <Send className="h-3.5 w-3.5" />
+              Send to Authority
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

@@ -116,6 +116,23 @@ Return a JSON object with these exact section keys:`,
       "oversight_effectiveness_evaluation",
     ],
   },
+  declaration_of_conformity: {
+    ragQuery: "Article 47 EU declaration of conformity high-risk AI systems provider signed",
+    systemPrompt: `You are an EU AI Act compliance specialist. Generate an EU Declaration of Conformity per Article 47 for the following high-risk AI system.
+
+The declaration must be legally precise and auditable. Use the provider organisation name from the system context. Reference specific harmonised standards applied or note where self-assessment was used in the absence of applicable harmonised standards. Do not use generic placeholders — base each field on the system's actual data.
+
+Return a JSON object with these exact section keys:`,
+    sections: [
+      "provider_identification",
+      "system_identification",
+      "declaration_statement",
+      "harmonised_standards_applied",
+      "notified_body_involvement",
+      "relevant_eu_ai_act_requirements",
+      "place_date_and_signature",
+    ],
+  },
 };
 
 const SECTION_LABELS: Record<string, string> = {
@@ -171,6 +188,14 @@ const SECTION_LABELS: Record<string, string> = {
   decision_review_and_appeal_process: "Decision review and appeal process",
   monitoring_and_escalation_protocols: "Monitoring and escalation protocols",
   oversight_effectiveness_evaluation: "Oversight effectiveness evaluation",
+  // Declaration of Conformity (Article 47)
+  provider_identification: "Provider identification",
+  system_identification: "AI system identification",
+  declaration_statement: "Declaration statement",
+  harmonised_standards_applied: "Harmonised standards applied",
+  notified_body_involvement: "Notified body involvement",
+  relevant_eu_ai_act_requirements: "Relevant EU AI Act requirements",
+  place_date_and_signature: "Place, date and signature",
 };
 
 export async function POST(req: Request) {

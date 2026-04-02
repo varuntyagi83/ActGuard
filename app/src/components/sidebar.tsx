@@ -11,18 +11,21 @@ import {
   FileText,
   Settings,
   LogOut,
+  Ban,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, minRole: "viewer" },
   { href: "/systems", label: "AI Systems", icon: Cpu, minRole: "viewer" },
+  { href: "/prohibited", label: "Prohibited Check", icon: Ban, minRole: "viewer" },
   { href: "/incidents", label: "Incidents", icon: AlertTriangle, minRole: "compliance_officer" },
   { href: "/reports", label: "Reports", icon: FileText, minRole: "compliance_officer" },
-  { href: "/settings", label: "Settings", icon: Settings, minRole: "admin" },
+  { href: "/settings", label: "Settings", icon: Settings, minRole: "compliance_officer" },
 ];
 
 const ROLE_LEVELS: Record<string, number> = {
@@ -46,10 +49,16 @@ export function Sidebar({ user, orgName }: SidebarProps) {
   return (
     <div className="flex flex-col w-64 bg-white dark:bg-gray-950 border-r h-full">
       {/* Logo + Org */}
-      <div className="px-6 py-5">
-        <div className="flex items-center gap-2">
-          <Shield className="h-6 w-6 text-blue-600" />
-          <span className="text-lg font-bold">ActGuard</span>
+      <div className="px-4 py-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6 text-blue-600" />
+            <span className="text-lg font-bold">ActGuard</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <ThemeToggle />
+          </div>
         </div>
         <p className="text-xs text-muted-foreground mt-1 truncate">{orgName}</p>
       </div>
@@ -93,7 +102,6 @@ export function Sidebar({ user, orgName }: SidebarProps) {
             <p className="text-xs text-muted-foreground truncate capitalize">{user.role.replace("_", " ")}</p>
           </div>
         </div>
-        <ThemeToggle />
         <Button
           variant="ghost"
           size="sm"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Shield } from "lucide-react";
@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
@@ -62,80 +62,83 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6 text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Invalid or missing reset link.
-            </p>
-            <Link href="/forgot-password">
-              <Button variant="outline">Request a new link</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardContent className="pt-6 text-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Invalid or missing reset link.
+          </p>
+          <Link href="/forgot-password">
+            <Button variant="outline">Request a new link</Button>
+          </Link>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 mb-2"
-          >
-            <Shield className="h-6 w-6 text-blue-600" />
-            <span className="text-lg font-bold">ActGuard</span>
-          </Link>
-          <CardTitle className="text-2xl">Set new password</CardTitle>
-          <CardDescription>Enter your new password below</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {success ? (
-            <div className="text-center space-y-4">
-              <div className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 text-sm rounded-md p-4">
-                Your password has been reset successfully.
-              </div>
-              <Link href="/sign-in">
-                <Button className="w-full">Sign in with new password</Button>
-              </Link>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <Link href="/" className="inline-flex items-center justify-center gap-2 mb-2">
+          <Shield className="h-6 w-6 text-blue-600" />
+          <span className="text-lg font-bold">ActGuard</span>
+        </Link>
+        <CardTitle className="text-2xl">Set new password</CardTitle>
+        <CardDescription>Enter your new password below</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {success ? (
+          <div className="text-center space-y-4">
+            <div className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 text-sm rounded-md p-4">
+              Your password has been reset successfully.
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="bg-red-50 text-red-700 text-sm rounded-md p-3">
-                  {error}
-                </div>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="At least 8 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+            <Link href="/sign-in">
+              <Button className="w-full">Sign in with new password</Button>
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-red-50 text-red-700 text-sm rounded-md p-3">
+                {error}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm">Confirm password</Label>
-                <Input
-                  id="confirm"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Resetting..." : "Reset password"}
-              </Button>
-            </form>
-          )}
-        </CardContent>
-      </Card>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="password">New password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirm">Confirm password</Label>
+              <Input
+                id="confirm"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Resetting..." : "Reset password"}
+            </Button>
+          </form>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading…</div>}>
+        <ResetPasswordForm />
+      </Suspense>
     </div>
   );
 }

@@ -36,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDate } from "@/lib/format-date";
 
 interface User {
   id: string;
@@ -247,7 +248,7 @@ export function TeamManager({ users: initialUsers, currentUserId }: Props) {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {new Date(user.createdAt).toLocaleDateString()}
+                      {formatDate(user.createdAt)}
                     </TableCell>
                     <TableCell>
                       {!isCurrentUser && (

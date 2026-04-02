@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { DocumentViewer } from "@/components/document-viewer";
+import { formatDate } from "@/lib/format-date";
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   technical_doc: "Technical Documentation",
@@ -111,7 +112,7 @@ export default async function DocumentViewPage({
           </h1>
           <p className="text-muted-foreground mt-1">
             {doc.aiSystem.name} — Generated{" "}
-            {doc.generatedAt.toLocaleDateString()}
+            {formatDate(doc.generatedAt)}
           </p>
         </div>
         {allVersions.length > 1 && (

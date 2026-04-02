@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatDate, formatDateTime } from "@/lib/format-date";
 import {
   Loader2,
   Send,
@@ -9,6 +10,7 @@ import {
   Building2,
   Mail,
   MessageSquare,
+  Bell,
 } from "lucide-react";
 import { IncidentReportPanel } from "@/components/incident-report-panel";
 import { Button } from "@/components/ui/button";
@@ -56,9 +58,15 @@ interface TimelineEntry {
   creatorName: string;
 }
 
+interface ReportSummary {
+  reportType: string;
+  submittedAt: string | null;
+}
+
 interface Props {
   incident: Incident;
   timeline: TimelineEntry[];
+  reports?: ReportSummary[];
 }
 
 const STATUS_FLOW = ["draft", "reported", "investigating", "resolved", "closed"];
@@ -74,6 +82,7 @@ const eventTypeIcons: Record<string, string> = {
 export function IncidentDetail({
   incident: initialIncident,
   timeline: initialTimeline,
+  reports = [],
 }: Props) {
   const router = useRouter();
   const [incident, setIncident] = useState(initialIncident);
@@ -146,10 +155,34 @@ export function IncidentDetail({
     setSavingDetails(false);
   }
 
+  const hasSubmittedInitial = reports.some(
+    (r) => r.reportType === "initial" && r.submittedAt
+  );
+  const hasFollowUp = reports.some((r) =>
+    ["follow_up", "combined", "final"].includes(r.reportType)
+  );
+  const showFollowUpReminder = hasSubmittedInitial && !hasFollowUp;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Main content */}
       <div className="lg:col-span-2 space-y-6">
+        {/* Follow-up report reminder */}
+        {showFollowUpReminder && (
+          <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 dark:bg-blue-950/30 dark:border-blue-900 px-4 py-3">
+            <Bell className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+            <div className="text-sm">
+              <p className="font-medium text-blue-900 dark:text-blue-200">
+                Follow-up report required
+              </p>
+              <p className="text-blue-700 dark:text-blue-400 mt-0.5">
+                You submitted an initial report. Article 73 requires a follow-up
+                report once the investigation is complete. Create one below.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Description */}
         <Card>
           <CardHeader>
@@ -307,7 +340,7 @@ export function IncidentDetail({
                     <p className="text-sm">{entry.description}</p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {entry.creatorName} —{" "}
-                      {new Date(entry.createdAt).toLocaleString()}
+                      {formatDateTime(entry.createdAt)}
                     </p>
                   </div>
                 </div>
@@ -330,16 +363,16 @@ export function IncidentDetail({
           <CardContent>
             <p className="text-sm">
               <strong>Incident:</strong>{" "}
-              {new Date(incident.incidentDate).toLocaleString()}
+              {formatDateTime(incident.incidentDate)}
             </p>
             <p className="text-sm mt-1">
               <strong>Deadline:</strong>{" "}
-              {new Date(incident.reportingDeadline).toLocaleString()}
+              {formatDateTime(incident.reportingDeadline)}
             </p>
             {incident.reportedAt && (
               <p className="text-sm mt-1 text-green-700 dark:text-green-300">
                 <strong>Reported:</strong>{" "}
-                {new Date(incident.reportedAt).toLocaleString()}
+                {formatDateTime(incident.reportedAt)}
               </p>
             )}
           </CardContent>

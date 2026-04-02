@@ -72,11 +72,13 @@ export async function sendIncidentReportEmail(
   authorityEmail: string,
   incidentTitle: string,
   reportType: string,
-  pdfBuffer: Buffer
+  pdfBuffer: Buffer,
+  replyTo?: string
 ) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: authorityEmail,
+    replyTo: replyTo || undefined,
     subject: `[EU AI Act - Art. 73] Incident Report: ${incidentTitle} (${reportType})`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
