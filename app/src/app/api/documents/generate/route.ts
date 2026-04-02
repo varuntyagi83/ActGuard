@@ -284,9 +284,10 @@ Classification Reasoning: ${system.classificationReasoning ? JSON.parse(system.c
 
     return NextResponse.json({ document: doc });
   } catch (error) {
-    console.error("Document generation error:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Document generation error:", message);
     return NextResponse.json(
-      { error: "Document generation failed" },
+      { error: message },
       { status: 500 }
     );
   }
