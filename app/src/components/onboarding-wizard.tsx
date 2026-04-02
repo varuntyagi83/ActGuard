@@ -103,12 +103,12 @@ export function OnboardingWizard({ systems }: OnboardingWizardProps) {
           description="Register the AI systems your organisation builds or deploys. Every system must be documented under the EU AI Act."
           action={
             hasSystem ? null : (
-              <Button asChild size="sm">
-                <Link href="/systems/new">
+              <Link href="/systems/new">
+                <Button size="sm">
                   Register AI System
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             )
           }
           extra={
@@ -128,12 +128,12 @@ export function OnboardingWizard({ systems }: OnboardingWizardProps) {
           description="The EU AI Act defines four risk tiers: unacceptable, high-risk, limited risk, and minimal risk. Classification determines your compliance obligations."
           action={
             !hasSystem ? null : allClassified ? null : unclassifiedSystems.length > 0 ? (
-              <Button asChild size="sm">
-                <Link href={`/systems/${unclassifiedSystems[0].id}`}>
+              <Link href={`/systems/${unclassifiedSystems[0].id}`}>
+                <Button size="sm">
                   Classify Now
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             ) : null
           }
           extra={
@@ -164,12 +164,12 @@ export function OnboardingWizard({ systems }: OnboardingWizardProps) {
           active={activeStep === 2}
           description="High-risk AI systems require specific compliance documents — technical documentation, risk management plans, and more. Generate them from the Reports page."
           action={
-            <Button asChild size="sm" variant={activeStep === 2 ? "default" : "outline"}>
-              <Link href="/reports">
+            <Link href="/reports">
+              <Button size="sm" variant={activeStep === 2 ? "default" : "outline"}>
                 View Compliance Status
                 <ChevronRight className="h-3.5 w-3.5 ml-1" />
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           }
         />
 

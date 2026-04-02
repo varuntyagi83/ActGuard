@@ -28,12 +28,12 @@ export default async function OnboardingPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-6 flex items-center gap-3">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/dashboard">
+        <Link href="/dashboard">
+          <Button variant="ghost" size="sm">
             <ArrowLeft className="h-4 w-4 mr-1" />
             Dashboard
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
 
       <div className="mb-8">
