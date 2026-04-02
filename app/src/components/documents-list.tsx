@@ -74,8 +74,9 @@ interface Props {
   documents: Doc[];
 }
 
-export function DocumentsList({ systemId, systemName, riskTier, documents }: Props) {
+export function DocumentsList({ systemId, systemName, riskTier, documents: initialDocuments }: Props) {
   const router = useRouter();
+  const [docs, setDocs] = useState<Doc[]>(initialDocuments);
   const [generating, setGenerating] = useState<string | null>(null);
   const [expandedType, setExpandedType] = useState<string | null>(null);
 
@@ -89,6 +90,14 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
     });
 
     if (res.ok) {
+      const data = await res.json();
+      const newDoc: Doc = {
+        id: data.document.id,
+        docType: data.document.docType,
+        version: data.document.version,
+        generatedAt: data.document.generatedAt,
+      };
+      setDocs((prev) => [newDoc, ...prev]);
       router.refresh();
     }
 
@@ -96,9 +105,9 @@ export function DocumentsList({ systemId, systemName, riskTier, documents }: Pro
   }
 
   function getDocsForType(docType: string): Doc[] {
-    return documents
-      .filter((d) => d.docType === docType)
-      .sort((a, b) => b.version - a.version);
+    return docs
+      .filter((d: Doc) => d.docType === docType)
+      .sort((a: Doc, b: Doc) => b.version - a.version);
   }
 
   return (
