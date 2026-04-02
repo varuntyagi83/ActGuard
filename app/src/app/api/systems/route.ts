@@ -30,6 +30,17 @@ export async function POST(req: Request) {
       );
     }
 
+    // Enforce 1-system limit per organisation
+    const existing = await db.aiSystem.count({
+      where: { orgId: session!.user.orgId! },
+    });
+    if (existing >= 1) {
+      return NextResponse.json(
+        { error: "Your plan allows auditing 1 AI system. Delete the existing system to register a new one." },
+        { status: 403 }
+      );
+    }
+
     const system = await db.aiSystem.create({
       data: {
         orgId: session!.user.orgId!,
