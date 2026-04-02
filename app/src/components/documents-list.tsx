@@ -79,26 +79,36 @@ export function DocumentsList({ systemId, systemName, riskTier, documents: initi
   const [docs, setDocs] = useState<Doc[]>(initialDocuments);
   const [generating, setGenerating] = useState<string | null>(null);
   const [expandedType, setExpandedType] = useState<string | null>(null);
+  const [generateError, setGenerateError] = useState<string | null>(null);
 
   async function handleGenerate(docType: string) {
     setGenerating(docType);
+    setGenerateError(null);
 
-    const res = await fetch("/api/documents/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ systemId, docType }),
-    });
+    try {
+      const res = await fetch("/api/documents/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ systemId, docType }),
+      });
 
-    if (res.ok) {
       const data = await res.json();
-      const newDoc: Doc = {
-        id: data.document.id,
-        docType: data.document.docType,
-        version: data.document.version,
-        generatedAt: data.document.generatedAt,
-      };
-      setDocs((prev) => [newDoc, ...prev]);
-      router.refresh();
+
+      if (res.ok) {
+        const newDoc: Doc = {
+          id: data.document.id,
+          docType: data.document.docType,
+          version: data.document.version,
+          generatedAt: data.document.generatedAt,
+        };
+        setDocs((prev) => [newDoc, ...prev]);
+        router.refresh();
+      } else {
+        setGenerateError(data.error || `Generation failed (${res.status})`);
+      }
+    } catch (err) {
+      setGenerateError("Network error — please try again");
+      console.error("Document generation error:", err);
     }
 
     setGenerating(null);
@@ -112,6 +122,11 @@ export function DocumentsList({ systemId, systemName, riskTier, documents: initi
 
   return (
     <div className="space-y-4">
+      {generateError && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          Generation failed: {generateError}
+        </div>
+      )}
       {DOC_TYPES.map((dt) => {
         const allVersions = getDocsForType(dt.type);
         const latest = allVersions[0];
